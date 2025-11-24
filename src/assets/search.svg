@@ -1,0 +1,19 @@
+<svg width="167" height="171" viewBox="0 0 167 171" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M108.942 0C110.288 0 111.622 0.0537635 112.942 0.158203C87.198 2.19609 66.9419 23.7323 66.9419 50C66.9419 76.2677 87.198 97.8029 112.942 99.8408C111.622 99.9453 110.288 100 108.942 100C97.5299 99.9999 87.0132 96.1738 78.5981 89.7383C78.4589 89.9569 78.3015 90.1678 78.1245 90.3682L8.74654 168.875C6.91802 170.944 3.7581 171.14 1.68892 169.312C-0.380234 167.483 -0.57507 164.323 1.25338 162.254L70.6313 83.7471C70.8702 83.4768 71.1317 83.2382 71.4106 83.0322C63.6513 74.2229 58.9419 62.6621 58.9419 50C58.9419 22.3858 81.3277 0.000134023 108.942 0Z" fill="url(#paint0_linear_282_209)"/>
+<foreignObject x="63.9421" y="2" width="94" height="94"><div xmlns="http://www.w3.org/1999/xhtml" style="backdrop-filter:blur(2px);clip-path:url(#bgblur_0_282_209_clip_path);height:100%;width:100%"></div></foreignObject><circle data-figma-bg-blur-radius="4" cx="110.942" cy="49" r="43" fill="#F1EBCC"/>
+<foreignObject x="75.9421" y="12" width="74" height="74"><div xmlns="http://www.w3.org/1999/xhtml" style="backdrop-filter:blur(2px);clip-path:url(#bgblur_1_282_209_clip_path);height:100%;width:100%"></div></foreignObject><circle data-figma-bg-blur-radius="4" cx="112.942" cy="49" r="33" fill="#6B7F4F"/>
+<foreignObject x="93.9421" y="26" width="47" height="47"><div xmlns="http://www.w3.org/1999/xhtml" style="backdrop-filter:blur(2px);clip-path:url(#bgblur_2_282_209_clip_path);height:100%;width:100%"></div></foreignObject><circle data-figma-bg-blur-radius="4" cx="117.442" cy="49.5" r="19.5" fill="#493C33"/>
+<foreignObject x="91.9421" y="24" width="27" height="27"><div xmlns="http://www.w3.org/1999/xhtml" style="backdrop-filter:blur(2px);clip-path:url(#bgblur_3_282_209_clip_path);height:100%;width:100%"></div></foreignObject><circle data-figma-bg-blur-radius="4" cx="105.442" cy="37.5" r="9.5" fill="#F1EBCC"/>
+<foreignObject x="62.9421" y="-4" width="108" height="108"><div xmlns="http://www.w3.org/1999/xhtml" style="backdrop-filter:blur(2px);clip-path:url(#bgblur_4_282_209_clip_path);height:100%;width:100%"></div></foreignObject><circle data-figma-bg-blur-radius="4" cx="116.942" cy="50" r="50" fill="#A0BEBF" fill-opacity="0.6"/>
+<defs>
+<clipPath id="bgblur_0_282_209_clip_path" transform="translate(-63.9421 -2)"><circle cx="110.942" cy="49" r="43"/>
+</clipPath><clipPath id="bgblur_1_282_209_clip_path" transform="translate(-75.9421 -12)"><circle cx="112.942" cy="49" r="33"/>
+</clipPath><clipPath id="bgblur_2_282_209_clip_path" transform="translate(-93.9421 -26)"><circle cx="117.442" cy="49.5" r="19.5"/>
+</clipPath><clipPath id="bgblur_3_282_209_clip_path" transform="translate(-91.9421 -24)"><circle cx="105.442" cy="37.5" r="9.5"/>
+</clipPath><clipPath id="bgblur_4_282_209_clip_path" transform="translate(-62.9421 4)"><circle cx="116.942" cy="50" r="50"/>
+</clipPath><linearGradient id="paint0_linear_282_209" x1="108.942" y1="0" x2="108.942" y2="99.9999" gradientUnits="userSpaceOnUse">
+<stop stop-color="#F2A72D"/>
+<stop offset="1" stop-color="#D15C1D"/>
+</linearGradient>
+</defs>
+</svg>

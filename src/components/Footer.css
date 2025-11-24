@@ -1,0 +1,264 @@
+.footer-container {
+  background: #493c33;
+  color: #a0bebf;
+  padding: 50px 8%;
+  font-family: "Tajawal", sans-serif;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* ✅ القسم العلوي (روابط يمين ويسار) */
+.footer-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 40px;
+}
+
+.footer-section {
+  flex: 1;
+  min-width: 200px;
+}
+
+.footer-title {
+  font-size: 1.1rem;
+  margin-bottom: 12px;
+  color: #f2a72d;
+  font-weight: 600;
+}
+
+.footer-section ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.footer-section li {
+  margin-bottom: 8px;
+}
+
+.footer-section a {
+  color: #f1ebcc;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.footer-section a:hover {
+  color: #f2a72d;
+}
+
+/* ✅ القسم السفلي (الشعار والنبذة) */
+.footer-bottom {
+  text-align: center;
+  margin-top: 50px;
+}
+
+.footer-logo-circle {
+  width: 100px;
+  height: 100px;
+  margin: 0 auto 15px;
+  background: #f1ebcc; /* ← اللون الجديد */
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  /* توهج بنفس اللون – ناعم وحلو */
+ /* box-shadow:
+    0 0 20px #f1ebcc,
+    0 0 40px rgba(241, 235, 204, 0.7),
+    0 0 60px rgba(241, 235, 204, 0.5);*/
+
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.footer-logo-circle:hover {
+  transform: scale(1.05);
+ box-shadow:
+  0 0 15px rgba(160, 190, 191, 0.8),
+  0 0 30px rgba(160, 190, 191, 0.7),
+  0 0 45px rgba(160, 190, 191, 0.6);
+
+
+}
+
+.footer-logo {
+  width: 100%;
+  height: auto;
+}
+
+.footer-slogan {
+  font-size: 1rem;
+  margin-bottom: 10px;
+  color: #a0bebf;
+  font-weight: 500;
+}
+
+.footer-about {
+  font-size: 0.9rem;
+  color: #a0bebf;
+  line-height: 1.6;
+  max-width: 400px;
+  margin: 0 auto;
+}
+/* ─────────────── */
+/* ⭐ نبذة عنا */
+/* ─────────────── */
+.footer-about-section {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.about-title {
+  font-size: 1.3rem;
+  color: #f2a72d;
+  margin-bottom: 10px;
+}
+
+/* ─────────────── */
+/* ⭐ تابعنا على */
+/* ─────────────── */
+.social-links {
+  text-align: center;
+}
+
+.social-icons-row {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.social-icon-circle {
+  width: 50px;
+  height: 50px;
+  background: #a0bebf;
+  border-radius: 50%;
+  
+  /* توهج بنفس اللون f2a72d */
+ /* box-shadow:
+    0 0 10px rgba(242, 167, 45, 0.6),
+    0 0 20px rgba(242, 167, 45, 0.5),
+    0 0 30px rgba(242, 167, 45, 0.4);*/
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+.social-icon-circle:hover {
+  transform: scale(1.1);
+
+  /* توهج أقوى عند hover */
+  box-shadow:
+  0 0 15px rgba(160, 190, 191, 0.8),
+  0 0 30px rgba(160, 190, 191, 0.7),
+  0 0 45px rgba(160, 190, 191, 0.6);
+}
+
+.social-icon-circle img {
+  width: 55%;
+}
+
+/* ─────────────── */
+/* ⭐ تواصل معنا */
+/* ─────────────── */
+.footer-contact {
+  margin-top: 40px;
+  text-align: center;
+}
+
+.contact-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.contact-icon-circle {
+  width: 45px;
+  height: 45px;
+  background: #a0bebf;
+  border-radius: 50%;
+
+  /* نفس التوهج بلون f2a72d */
+  /*box-shadow:
+    0 0 10px rgba(242, 167, 45, 0.6),
+    0 0 20px rgba(242, 167, 45, 0.5),
+    0 0 30px rgba(242, 167, 45, 0.4);*/
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.contact-icon-circle:hover {
+ transform: scale(1.1);
+
+  /* توهج أقوى عند hover */
+ box-shadow:
+  0 0 15px rgba(160, 190, 191, 0.8),
+  0 0 30px rgba(160, 190, 191, 0.7),
+  0 0 45px rgba(160, 190, 191, 0.6);
+
+}
+
+.contact-icon-circle img {
+  width: 50%;
+}
+
+.contact-email {
+  color: #a0bebf;
+  font-size: 1rem;
+  transition: color 0.3s ease;
+}
+
+.contact-email:hover {
+  color: #f2a72d;
+}
+
+/* ─────────────── */
+/* ⭐ الجوال */
+/* ─────────────── *
+
+/* ✅ استجابة الجوال */
+@media (max-width: 768px) {
+  .footer-top {
+    flex-direction: column-reverse;
+    text-align: center;
+  }
+
+  .footer-section {
+    width: 100%;
+  }
+
+  .footer-section ul {
+    padding: 0;
+  }
+
+  .footer-bottom {
+    margin-top: 40px;
+  }
+
+  .footer-logo-circle {
+    width: 80px;
+    height: 80px;
+  }
+
+  .footer-about {
+    font-size: 0.85rem;
+    max-width: 300px;
+  }
+  .footer-top {
+    flex-direction: column;
+    text-align: center;
+    gap: 30px;
+  }
+
+  .footer-contact {
+    margin-top: 30px;
+  }
+
+}

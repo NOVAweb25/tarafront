@@ -1,0 +1,435 @@
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { motion, AnimatePresence, useAnimation } from "framer-motion";
+import { colors, fonts, iconSizes } from "../utils/theme";
+import logo from "../assets/logo.gif";
+import productIcon from "../assets/productMang.svg";
+import accountIcon from "../assets/person.svg";
+import statsIcon from "../assets/dashboard.svg";
+import toggleIcon from "../assets/back.svg";
+import bellIcon from "../assets/notification.svg";
+import { logoutUser, getNotifications } from "../api/api";
+import { messaging } from "../firebase";
+import { onMessage } from "firebase/messaging";
+import axios from "axios";
+
+
+const AdminSidebar = () => {
+  const [isOpen, setIsOpen] = useState(true);
+  const [openAdminMenu, setOpenAdminMenu] = useState(false);
+  const [openAccountMenu, setOpenAccountMenu] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [notifications, setNotifications] = useState([]);
+  const [toast, setToast] = useState(null);
+  const navigate = useNavigate();
+   const [pendingOrdersCount, setPendingOrdersCount] = useState(0);
+
+  const handleLogout = async () => {
+    try {
+      await logoutUser().catch(() => {});
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      setShowLogoutModal(false);
+      window.dispatchEvent(new Event("logout"));
+      navigate("/login", { replace: true });
+    } catch (err) {
+      console.error(" فشل تسجيل الخروج:", err);
+    }
+  };
+
+  const loadNotifications = async () => {
+  try {
+    // 🟢 جلب الطلبات التي تنتظر التأكيد فقط
+    const res = await axios.get("http://localhost:5000/api/orders?status=بانتظار تأكيد الطلب");
+    setPendingOrdersCount(res.data.length);
+  } catch (err) {
+    console.error(" خطأ أثناء جلب عدد الطلبات:", err);
+  }
+};
+
+  useEffect(() => {
+    loadNotifications();
+
+    // تحديث دوري كل 15 ثانية
+    const interval = setInterval(loadNotifications, 15000);
+
+    // استقبال إشعارات فورية من Firebase
+    onMessage(messaging, (payload) => {
+      console.log(" إشعار مباشر:", payload);
+      const { title, body } = payload.notification;
+
+      setToast({ title, body });
+      setTimeout(() => setToast(null), 5000);
+      new Notification(title, { body });
+
+      // 🟢 لو الإشعار عن طلب جديد، زِد الرقم مباشرة
+      if (title.includes("طلب جديد")) {
+        setPendingOrdersCount((prev) => prev + 1);
+      }
+
+      loadNotifications(); // تأكيد التحديث من السيرفر
+    });
+
+    // ✅ تنظيف التايمر عند مغادرة الصفحة
+    return () => clearInterval(interval);
+  }, []);
+
+
+
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("user"));
+    if (user?.role === "admin") {
+      import("../firebase").then(({ requestNotificationPermission }) => {
+        requestNotificationPermission(user._id);
+      });
+    }
+  }, []);
+
+useEffect(() => {
+  const handleOrdersViewed = () => {
+    setPendingOrdersCount(0);
+  };
+  window.addEventListener("ordersViewed", handleOrdersViewed);
+  return () => window.removeEventListener("ordersViewed", handleOrdersViewed);
+}, []);
+
+
+  const unreadCount = notifications.filter(n => !n.read).length;
+
+  return (
+    <>
+      {/* ✅ Toast Notification أعلى الصفحة */}
+      {toast && (
+        <motion.div
+          initial={{ y: -80, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          exit={{ y: -80, opacity: 0 }}
+          transition={{ duration: 0.4 }}
+          style={styles.toast}
+        >
+          <strong>{toast.title}</strong>
+          <p>{toast.body}</p>
+        </motion.div>
+      )}
+      {/* ✅ شريط جانبي متحرك */}
+      <motion.div
+        animate={{ width: isOpen ? 240 : 70 }}
+        drag="y" // ✅ التحريك عمودي فقط
+        dragElastic={0.2}
+        dragMomentum={false}
+        dragTransition={{ bounceStiffness: 300, bounceDamping: 25 }}
+        onDrag={(event, info) => {
+          const el = event.target.getBoundingClientRect();
+          const vh = window.innerHeight;
+          // 🔒 منع الخروج من أعلى أو أسفل الشاشة
+          const maxY = vh - el.height;
+          if (el.top < 0) {
+            event.target.style.top = "0px";
+          } else if (el.bottom > vh) {
+            event.target.style.top = `${maxY}px`;
+          }
+        }}
+        whileHover={{ scale: 1.02 }}
+        style={{
+          ...styles.sidebar,
+          cursor: "grab",
+          right: "10px", // ✅ ثابت من الجهة اليمنى
+          left: "auto", // تأكيد
+        }}
+        whileTap={{ cursor: "grabbing" }}
+      >
+        {/* الشعار */}
+        <div style={styles.logoContainer}>
+          <div style={styles.logoCircle}>
+            <img src={logo} alt="Logo" style={styles.logo} />
+          </div>
+        </div>
+        {/* ✅ خانة متابعة الموقع */}
+        <Link to="/admin/stats" style={styles.menuItem}>
+          <img src={statsIcon} alt="Stats" style={styles.icon} />
+          {isOpen && <span style={styles.menuText}>متابعة الموقع</span>}
+        </Link>
+        {/* إدارة */}
+        <div style={styles.menu}>
+          <div
+            style={styles.menuItem}
+            onClick={() => setOpenAdminMenu(!openAdminMenu)}
+          >
+            <img src={productIcon} alt="Admin" style={styles.icon} />
+            {isOpen && <span style={styles.menuText}>إدارة</span>}
+            {isOpen && (
+              <span style={styles.arrow}>{openAdminMenu ? "▲" : "▼"}</span>
+            )}
+          </div>
+          <AnimatePresence>
+            {openAdminMenu && isOpen && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.3 }}
+                style={styles.subMenu}
+              >
+                <Link to="/admin/sections" style={styles.subMenuItem}>
+                  إدارة الأقسام
+                </Link>
+                <Link to="/admin/categories" style={styles.subMenuItem}>
+                  إدارة التصنيفات
+                </Link>
+                <Link to="/admin/products" style={styles.subMenuItem}>
+                  إدارة المنتجات
+                </Link>
+                {/* ✅ إدارة الطلبات + الجرس */}
+                <div style={{ position: "relative" }}>
+  <Link to="/admin/orders" style={styles.subMenuItem}>
+    إدارة الطلبات
+  </Link>
+  {pendingOrdersCount > 0 && (
+    <span
+      style={{
+        position: "absolute",
+        top: -5,
+        right: -8,
+        background: "#d15c1d",
+        color: "#f1ebcc",
+        borderRadius: "50%",
+        fontSize: "11px",
+        padding: "2px 6px",
+        fontWeight: "bold",
+      }}
+    >
+      {pendingOrdersCount}
+    </span>
+  )}
+</div>
+
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+        {/* حسابي */}
+        <div style={styles.menu}>
+          <div
+            style={styles.menuItem}
+            onClick={() => setOpenAccountMenu(!openAccountMenu)}
+          >
+            <img src={accountIcon} alt="Account" style={styles.icon} />
+            {isOpen && <span style={styles.menuText}>حسابي</span>}
+            {isOpen && (
+              <span style={styles.arrow}>{openAccountMenu ? "▲" : "▼"}</span>
+            )}
+          </div>
+          <AnimatePresence>
+            {openAccountMenu && isOpen && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.3 }}
+                style={styles.subMenu}
+              >
+                <Link to="/admin/profile" style={styles.subMenuItem}>
+                  إعدادات المسؤول
+                </Link>
+                <Link to="/admin/settings" style={styles.subMenuItem}>
+                  إعدادات الدفع
+                </Link>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+        {/* زر تسجيل الخروج */}
+        {isOpen && (
+          <div
+            style={styles.logoutButton}
+            onClick={() => setShowLogoutModal(true)}
+          >
+            تسجيل الخروج
+          </div>
+        )}
+        {/* زر الطي */}
+        <div style={styles.toggleButton} onClick={() => setIsOpen(!isOpen)}>
+          <img
+            src={toggleIcon}
+            alt="Toggle"
+            style={{ width: "24px", height: "24px" }}
+          />
+        </div>
+      </motion.div>
+      {/* نافذة تأكيد الخروج */}
+      {showLogoutModal && (
+        <div style={styles.modalOverlay}>
+          <motion.div
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            style={styles.modal}
+          >
+            <h3 style={styles.modalTitle}>تأكيد تسجيل الخروج</h3>
+            <p style={styles.modalText}>هل أنت متأكد أنك تريد تسجيل الخروج؟</p>
+            <div style={styles.modalButtons}>
+              <button
+                style={{ ...styles.button, background: "#f1ebcc" }}
+                onClick={handleLogout}
+              >
+                نعم
+              </button>
+              <button
+                style={{ ...styles.button, background: "#f1ebcc" }}
+                onClick={() => setShowLogoutModal(false)}
+              >
+                إلغاء
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
+    </>
+  );
+};
+
+export default AdminSidebar;
+
+/* 🎨 الأنماط */
+const styles = {
+sidebar: {
+  position: "fixed",
+  top: 60,
+  right: 10,
+  backdropFilter: "blur(12px)", // تأثير الزجاج
+  backgroundColor: "rgba(160, 190, 191, 0.35)", // ← a0bebf بشفافية
+  borderRadius: "16px",
+  border: "1px solid rgba(255, 255, 255, 0.25)", // إطار زجاجي لطيف
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "flex-start",
+  padding: "12px 8px",
+  boxShadow: "0 4px 18px rgba(0,0,0,0.15)",
+  zIndex: 1000,
+  fontFamily: fonts.primary,
+  width: "fit-content",
+},
+
+  toast: {
+    position: "fixed",
+    top: "20px",
+    right: "20px",
+    background: "#d15c1d",
+    color: "#f1ebcc",
+    padding: "15px 20px",
+    borderRadius: "30px",
+    boxShadow: "0 4px 12px rgba(0,0,0,0.3)",
+    zIndex: 3000,
+  },
+  logoContainer: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    width: "100%",
+    marginBottom: "10px",
+  },
+  logoCircle: {
+    background: "#f1ebcc",
+    borderRadius: "50%",
+    padding: "10px",
+    width: "60px",
+    height: "60px",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  logo: { width: "100%", maxWidth: "50px" },
+  menu: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "6px",
+    width: "100%",
+    padding: "0 6px",
+  },
+  menuItem: {
+    display: "flex",
+    alignItems: "center",
+    gap: "10px",
+    padding: "10px",
+    borderRadius: "30px",
+    textDecoration: "none",
+    color: "#493c33",
+    fontSize: "15px",
+    fontWeight: "500",
+    cursor: "pointer",
+    width: "100%",
+    transition: "background 0.3s",
+  },
+  icon: { width: "40px", height: iconSizes.large },
+  menuText: { whiteSpace: "nowrap", flexGrow: 1 },
+  arrow: { fontSize: "12px" },
+  subMenu: {
+    display: "flex",
+    flexDirection: "column",
+    marginRight: "15px",
+    marginTop: "4px",
+    gap: "6px",
+  },
+  subMenuItem: {
+  color: "#f1ebcc",
+  background: "rgba(107, 127, 79, 0.35)", // ← 6b7f4f مع شفافية
+  textDecoration: "none",
+  padding: "8px 12px",
+  fontSize: "14px",
+  borderRadius: "30px",
+  transition: "all 0.2s",
+},
+
+  toggleButton: {
+    cursor: "pointer",
+    alignSelf: "center",
+    marginTop: "8px",
+  },
+  logoutButton: {
+    padding: "10px",
+    marginTop: "10px",
+    background: "#6b7f4f",
+    color: "#f1ebcc",
+    textAlign: "center",
+    borderRadius: "30px",
+    cursor: "pointer",
+    fontWeight: "bold",
+    width: "100%",
+  },
+  modalOverlay: {
+    position: "fixed",
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 2000,
+  },
+  modal: {
+    background: "#a0bebf",
+    padding: "20px",
+    borderRadius: "30px",
+    width: "90%",
+    maxWidth: "320px",
+    textAlign: "center",
+    boxShadow: "0 6px 20px rgba(0,0,0,0.2)",
+  },
+  modalTitle: { fontSize: "18px", color: "#f1ebcc", marginBottom: "10px" },
+  modalText: { fontSize: "14px", color: "#493c33", marginBottom: "20px" },
+  modalButtons: {
+    display: "flex",
+    justifyContent: "space-between",
+    gap: "150px",
+  },
+  button: {
+    flex: 1,
+    padding: "5px",
+    border: "none",
+    borderRadius: "30px",
+    color: "#d15c1d",
+    cursor: "pointer",
+    fontFamily: fonts.primary,
+  },
+};

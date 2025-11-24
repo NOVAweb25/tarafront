@@ -1,0 +1,617 @@
+/* AdminProducts.css */
+.admin-page {
+  background: #f1ebcc !important;
+  min-height: 100vh;
+}
+
+.admin-products-container {
+
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 80px 15px 100px;
+  font-family: "Tajawal", sans-serif;
+  background: #f1ebcc;
+  min-height: 100vh;
+  position: relative;
+}
+/* شريط البحث */
+.search-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin: 20px auto 15px;
+  width: 90%;
+  background: #f1ebcc;
+  max-width: 420px;
+}
+.search-input {
+  flex: 1;
+  padding: 10px 45px 10px 15px;
+  border-radius: 30px;
+  border: 1px solid #f2a72d;
+  outline: none;
+  font-size: 15px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  background: #fff;
+  direction: rtl;
+}
+.search-icon {
+  position: absolute;
+  right: 12px;
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+.search-icon:hover {
+  opacity: 1;
+}
+/* زر الإضافة */
+.add-btn {
+  position: fixed;
+  top: 65px;
+  right: 20px;
+  background: #6b7f4f;
+  border: none;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  min-width: 50px;
+}
+.add-btn img {
+  width: 24px;
+}
+/* قائمة المنتجات */
+.products-list {
+  margin-top: 130px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  overflow-y: auto;
+  max-height: calc(100vh - 150px);
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 20px;
+}
+/* بطاقة المنتج - معكوسة إلى LTR */
+.product-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background: #fff;
+  border-radius: 30px;
+  padding: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  position: relative;
+  direction: ltr;
+}
+.product-actions.side {
+  display: flex;
+  flex-direction: row; /* ✅ أفقي */
+  gap: 8px;
+  position: absolute;
+  top: 10px;
+  left:-250px; /* ✅ الجهة اليسار */
+  z-index: 5;
+}
+
+.product-actions.side button {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+.product-actions.side button:hover {
+  transform: scale(1.05);
+}
+
+.edit-btn {
+  background: #e0e7ff;
+}
+
+.delete-btn {
+  background: #ffe0e0;
+}
+
+.product-actions img {
+  width: 18px;
+  height: 18px;
+}
+
+.product-left img {
+  width: 90px;
+  height: 90px;
+  border-radius: 12px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+.product-right {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  text-align: left; /* نصوص إلى اليسار */
+}
+.product-right h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #493c33;
+  margin: 0;
+}
+.product-right .price {
+  color: #d15c1d;
+  font-weight: bold;
+  font-size: 14px;
+}
+.product-right .stock {
+  color: #6b7f4f;
+  font-size: 13px;
+}
+/* 🔹 شريط الصور */
+.product-gallery {
+  display: flex;
+  gap: 8px;                       /* المسافة بين الصور */
+  overflow-x: auto;               /* ✅ تفعيل التمرير الأفقي */
+  padding: 6px 0;
+  width: 200px;                   /* ✅ عرض الشريط الثابت */
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.product-gallery::-webkit-scrollbar {
+  display: none; /* يخفي شريط التمرير */
+}
+
+/* 🔹 الصور داخل الشريط */
+.product-gallery img {
+  flex: 0 0 auto;                 /* يمنع الصور من التمدد */
+  width: 70px;                    /* ✅ العرض الثابت */
+  height: 70px;                   /* ✅ الارتفاع الثابت */
+  border-radius: 30px;
+  border: 1px solid #f2a72d;
+  object-fit: cover;
+  scroll-snap-align: start;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+
+.product-gallery img:hover,
+.product-gallery img:active {
+  transform: scale(1.05);
+}
+/* النافذة المنبثقة */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(5px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 10px;
+}
+
+.modal {
+  background: #fff;
+  border-radius: 20px;
+  width: 100%;
+  max-width: 430px;
+  max-height: 90vh; /* ✅ يحد ارتفاع النافذة */
+  overflow-y: auto; /* ✅ يسمح بالسكرول */
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch; /* ✅ تمرير ناعم في الجوال */
+  touch-action: pan-y;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  direction: rtl;
+  text-align: right;
+  position: relative;
+}
+
+
+
+
+.modal h2 {
+  margin: 0 0 10px;
+  font-size: 18px;
+  font-weight: 600;
+  color: #493c33;
+  text-align: center;
+}
+
+.modal form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  flex: 1;
+  width: 100%;
+}
+.modal form label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #493c33;
+  margin-bottom: 6px;
+  display: block;
+}
+.grabber {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 36px;
+  height: 5px;
+  border-radius: 3px;
+  background-color: #a0bebf;
+  display: none;
+}
+.cancel-btn {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  background: #f2f2f7;
+  border: none;
+  border-radius: 50%;
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.cancel-btn:hover {
+  background: #e0e0e0;
+}
+.image-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.main-image-preview {
+  width: 100%;
+  height: 180px;
+  background: #6b7f4f;
+  border-radius: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.main-image-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.multiple-images-picker {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.multiple-images-picker .add-image-btn {
+  background: #6b7f4f;
+  border: none;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  min-width: 50px;
+  flex-shrink: 0;
+}
+.multiple-images-picker .add-image-btn img {
+  width: 24px;
+}
+
+.add-image-btn img {
+  width: 24px;
+  height: 24px;
+  filter: brightness(0) invert(1);
+}
+.images-preview {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.images-preview::-webkit-scrollbar {
+  display: none;
+}
+.images-preview::-webkit-scrollbar-thumb {
+  background: #a0bebf;
+  border-radius: 30px;
+}
+
+.image-wrapper {
+  position: relative;
+  flex: 0 0 25%;
+  max-width: 25%;
+  aspect-ratio: 1/1;
+  border-radius: 10px;
+  overflow: hidden;
+  scroll-snap-align: start;
+}
+.image-wrapper:hover {
+  transform: scale(1.03);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+.image-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.image-wrapper:hover img {
+  transform: scale(1.05);
+}
+
+.image-wrapper .remove-btn {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: none;
+  background: #d15c1d;
+  color: #f2a72d;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.image-wrapper .remove-btn:hover {
+  background: white;
+  transform: scale(1.1);
+}
+
+.modal label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1d1d1f;
+  margin-bottom: 6px;
+  display: block;
+}
+
+
+.modal form input,
+.modal form select,
+.modal form textarea {
+  width: 100%;
+  padding: 12px;
+  font-size: 15px;
+  border: 1px solid #d2d2d7;
+  border-radius:30px;
+  background: #fff;
+  outline: none;
+  text-align: right;
+  direction: rtl;
+  transition: border-color 0.2s;
+}
+.modal form input:focus,
+.modal form select:focus,
+.modal form textarea:focus {
+  border-color: #f2a72d;
+}
+
+
+.modal form textarea {
+  min-height: 84px;
+  resize: vertical;
+}
+.save-btn {
+  width: 100%;
+  margin-top: 5px;
+  padding: 14px;
+  font-size: 16px;
+  font-weight: 600;
+  color: white;
+  background: #007aff;
+  border: none;
+  border-radius: 30px;
+  cursor: pointer;
+  position: sticky;
+  bottom: 0;
+}
+.save-btn:hover {
+  background: #005fcc;
+}
+.cancel-btn img {
+  width: 18px;
+  height: 18px;
+  opacity: 0.7;
+  transition: 0.2s;
+}
+
+.cancel-btn img:hover {
+  opacity: 1;
+}
+
+
+.no-products {
+  text-align: center;
+  color: #a0bebf;
+  font-size: 16px;
+  margin-top: 50px;
+}
+.image-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 30;
+  padding: 20px;
+}
+.image-modal {
+  position: relative;
+  max-width: 90%;
+  max-height: 90%;
+}
+.enlarged-image {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: 30px;
+}
+
+.images-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border-top: 1px solid #f2a72d;
+  padding-top: 10px;
+}
+
+.images-section h3 {
+  font-size: 15px;
+  font-weight: 600;
+  color: #a0bebf;
+  margin: 0 0 5px 0;
+}
+
+.images-actions button {
+  background: #6b7f4f;
+  border: none;
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.images-actions img {
+  width: 20px;
+  height: 20px;
+  filter: brightness(0) invert(1);
+}
+
+.images-actions button:hover {
+  background: #005fcc;
+}
+
+
+.images-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 10px;
+}
+
+.image-close-btn {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  background: rgba(255, 255, 255, 0.9);
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  min-width: 40px;
+  min-height: 40px;
+}
+.image-close-btn img {
+  width: 20px;
+}
+
+.out-of-stock {
+  color: #6b7f4f;   /* أحمر جميل */
+  font-weight: bold;
+}
+
+/* تحسينات إضافية للجوال */
+/* 🎯 تنسيق جديد لبطاقة المنتج في الجوال */
+@media (max-width: 480px) {
+  .product-card {
+    flex-direction: row-reverse;       /* ✅ البيانات يمين */
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 12px;
+    border-radius: 14px;
+    gap: 10px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .product-left img {
+    width: 65px;                       /* ✅ تصغير الصورة */
+    height: 65px;
+    border-radius: 10px;
+  }
+
+  .product-right {
+    flex: 1;
+    text-align: right;                 /* ✅ البيانات يمين */
+    direction: rtl;
+  }
+
+  .product-right h3 {
+    font-size: 15px;
+    margin-bottom: 4px;
+  }
+
+  .product-right .price {
+    font-size: 14px;
+  }
+
+  .product-right .stock {
+    font-size: 13px;
+    color: #777;
+  }
+
+  .product-actions.side {
+    flex-direction: row;               /* ✅ أزرار أفقية */
+    position: relative;
+    right: auto;
+    top: auto;
+    gap: 6px;
+    order: 3;                          /* ✅ تظهر يسار البطاقة */
+  }
+
+  .product-actions.side button {
+    width: 34px;
+    height: 34px;
+  }
+
+  .edit-btn {
+    background: #f2f2f7;
+  }
+
+  .delete-btn {
+    background: #ffe5e5;
+  }
+}

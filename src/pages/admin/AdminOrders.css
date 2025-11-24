@@ -1,0 +1,579 @@
+.admin-page {
+  font-family: "Tajawal", sans-serif;
+  background: #f8f8f8;
+  min-height: 100vh;
+  padding: 80px 15px 100px;
+}
+
+/* 🔍 شريط البحث */
+.search-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end; /* يضمن أن الأيقونة تكون على اليمين */
+  margin: 20px auto;
+  width: 95%;
+  max-width: 700px;
+}
+.search-container.wide {
+  width: 95%;
+  max-width: 700px;
+  margin: 20px auto;
+}
+
+.status-popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #a0bebf;
+  border-radius: 16px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+  z-index: 9999;
+  width: 90%;
+  max-width: 380px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  animation: fadeInModal 0.3s ease;
+}
+
+/* رأس النافذة */
+.popup-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #f2a72d;
+  padding-bottom: 10px;
+  margin-bottom: 10px;
+}
+
+.popup-header h3 {
+  font-size: 16px;
+  color: #493c33;
+  margin: 0;
+}
+
+.close-popup {
+  background: none;
+  border: none;
+  font-size: 20px;
+  color: #777;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+.close-popup:hover {
+  color: #000;
+}
+
+/* جسم النافذة */
+.popup-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 300px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+/* الخيارات */
+.popup-option {
+  padding: 10px 14px;
+  border-radius: 30px;
+  background: #6b7f4f;
+  color: #f1ebcc;
+  text-align: center;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+}
+
+.popup-option:hover {
+  background: #f2a72d;
+}
+
+.popup-option.active {
+  background: #f2a72d;
+  border-color: #f2a72d;
+  color: #493c33;
+  font-weight: bold;
+}
+
+/* الخلفية */
+
+
+.status-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
+  z-index: 6000;
+  width: 90%;
+  max-width: 380px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  animation: fadeInModal 0.25s ease;
+}
+.status-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 10px;
+  margin-bottom: 10px;
+}
+
+.status-modal-header h3 {
+  font-size: 16px;
+  color: #493c33;
+}
+
+.close-modal-btn {
+  background: none;
+  border: none;
+  font-size: 18px;
+  color: #666;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+.close-modal-btn:hover {
+  color: #000;
+}
+
+.status-modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.status-modal .status-option {
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: #f8f8f8;
+  text-align: center;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+.status-modal .status-option:hover {
+  background: #f2f2f7;
+}
+.status-modal .status-option.active {
+  background: #e7f0ff;
+  color: #007aff;
+  font-weight: bold;
+  border: 1px solid #007aff;
+}
+.search-input {
+  flex: 1;
+  padding: 12px 50px 12px 15px;
+  border-radius: 25px;
+  border: 1px solid #ddd;
+  outline: none;
+  font-size: 15px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.07);
+  background: #fff;
+  direction: rtl;
+  transition: all 0.2s ease;
+}
+.search-input:focus {
+  box-shadow: 0 0 0 3px rgba(86, 142, 255, 0.2);
+}
+
+.search-icon {
+  position: absolute;
+  right: 18px;
+  width: 24px;
+  cursor: pointer;
+  opacity: 0.8;
+  transition: opacity 0.2s;
+}
+.search-icon:hover {
+  opacity: 1;
+}
+
+/* 🎚️ فلترة الحالة */
+.filterContainer {
+  width: 100%;
+  max-width: 420px;
+  margin: 0 auto 15px;
+}
+
+.filter-select {
+  width: 100%;
+  padding: 10px 14px;
+  font-size: 15px;
+  border-radius: 25px;
+  border: 1px solid #ddd;
+  background: #fff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  outline: none;
+  direction: rtl;
+}
+
+/* 📋 قائمة الطلبات */
+.orders-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 0 10px;
+}
+
+.order-card {
+  background: #fff;
+  border-radius: 18px;
+  padding: 15px 18px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start; /* 🔹 خليها من الأعلى عشان القائمة تنزل طبيعي */
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  width: 95%;
+  margin: 0 auto;
+  position: relative; /* 🟢 يسمح للقائمة بالظهور فوقها */
+  overflow: visible !important; /* 🟢 يمنع قص القائمة */
+}
+
+.order-card.wide {
+  width: 95%;
+  max-width: 700px;
+  margin: 15px auto;
+}
+
+
+.order-card:active {
+  transform: scale(0.98);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+}
+
+.order-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.order-number {
+  font-weight: bold;
+  color: #121921;
+}
+
+.order-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* المسافة بين الحالة والفاتورة */
+}
+.client-name {
+  font-size: 14px;
+  color: #333;
+}
+
+.phone {
+  font-size: 13px;
+  color: #777;
+}
+
+.client-section {
+  background: #f9f9f9;
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 12px;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.client-section h4 {
+  margin-bottom: 8px;
+  color: #121921;
+}
+
+.client-map {
+  width: 100%;
+  height: 180px;
+  border: none;
+  margin-top: 6px;
+  border-radius: 10px;
+}
+
+.invoice-items-section h4 {
+  margin-bottom: 8px;
+  color: #121921;
+}
+
+
+/* 🎟️ أيقونة الفاتورة */
+.invoice-circle {
+  width: 44px;
+  height: 44px;
+  background: #fff;
+  border-radius: 50%;
+  border: none;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.invoice-circle:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.invoice-circle img {
+  width: 22px;
+}
+
+/* 📦 حالة الطلب */
+.status-btn {
+  position: relative;
+  background: #f9f9f9;
+  border-radius: 30px;
+  padding: 6px 14px;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  font-size: 13px;
+  color: #333;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 130px;
+  text-align: center;
+}
+.status-dropdown {
+  position: absolute;
+  top: calc(100% + 6px); /* 🟢 أسفل الزر مباشرة */
+  left: 50%;
+  transform: translateX(-50%);
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  z-index: 5000; /* 🟢 أعلى من كل العناصر */
+  width: 180px;
+  overflow: hidden;
+  animation: fadeIn 0.2s ease;
+}
+
+.status-option {
+  padding: 10px;
+  cursor: pointer;
+  font-size: 14px;
+  text-align: center;
+  border-bottom: 1px solid #eee;
+  background: #fff;
+  transition: background 0.2s ease;
+}
+
+.status-option:hover {
+  background: #f2f2f7;
+}
+
+.status-option:last-child {
+  border-bottom: none;
+}
+/* 🧾 نافذة الفاتورة */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 90;
+}
+
+.invoice-sheet {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: #fff;
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+  box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.15);
+  padding: 20px;
+  z-index: 100;
+  max-height: 85vh;
+  overflow-y: auto;
+  animation: slideUp 0.4s ease;
+}
+@keyframes fadeInModal {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -45%) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -5px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+@keyframes slideUp {
+from {
+    opacity: 0;
+    transform: translate(-50%, -5px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+.invoice-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 8px;
+  margin-bottom: 12px;
+}
+
+.invoice-header h3 {
+  font-size: 17px;
+  color: #121921;
+}
+
+.close-btn {
+  background: transparent;
+  border: none;
+  font-size: 16px;
+  color: #888;
+  cursor: pointer;
+}
+
+.invoice-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.invoice-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 1px solid #f2a72d;
+  padding-bottom: 8px;
+}
+
+.invoice-item img {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 30px;
+}
+
+.invoice-summary {
+  margin-top: 15px;
+  font-size: 14px;
+}
+
+.invoice-summary h4 {
+  color: #493c33;
+  font-size: 16px;
+  margin-top: 10px;
+}
+
+.total {
+  color: #f1ebcc;
+}
+
+.share-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #007aff;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 6px 12px;
+  margin-top: 10px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background 0.2s;
+}
+.share-btn:hover {
+  background: #005ecb;
+}
+
+.receipt-box {
+  margin-top: 15px;
+  padding: 12px;
+  background: #f9f9f9;
+  border-radius: 12px;
+}
+
+.receipt-file {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 30px;
+  padding: 10px 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 14px;
+  color: #f1ebcc;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  text-align: center;
+  margin-top: 6px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.receipt-file:hover {
+  background: #a0bebf;
+  border-color: #d15c1d;
+  box-shadow: 0 2px 10px rgba(86, 142, 255, 0.2);
+}
+
+.receipt-preview {
+  width: 100%;
+  margin-top: 12px;
+  border-radius: 30px;
+  border: 1px solid #f2a72d;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  object-fit: contain;
+  max-height: 420px;
+}
+/* 🎯 تعديل نافذة تحديث الحالة لتظهر في منتصف شاشة الجوال */
+@media (max-width: 480px) {
+  .status-popup {
+    position: fixed;
+    top: 50%;                /* ✅ منتصف الشاشة عموديًا */
+    left: 50%;               /* ✅ منتصف الشاشة أفقيًا */
+    transform: translate(-50%, -50%) !important; /* ✅ توسيط دقيق */
+    width: 90%;              /* ✅ عرض مناسب للجوال */
+    max-width: 350px;
+    padding: 18px;
+    border-radius: 18px;
+    background: #fff;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+    z-index: 9999;
+  }
+
+  .popup-header h3 {
+    font-size: 15px;
+  }
+
+  .popup-option {
+    font-size: 13px;
+    padding: 10px;
+  }
+
+  .close-popup {
+    font-size: 18px;
+  }
+}

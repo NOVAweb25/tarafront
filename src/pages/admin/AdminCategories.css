@@ -1,0 +1,324 @@
+/* AdminCategories.css */
+.admin-layout {
+  display: flex;
+  flex-direction: row-reverse;
+  min-height: 100vh;
+  background: #f1ebcc;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.admin-categories-container {
+  flex: 1;
+  padding: 24px;
+  max-width: 1000px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* 🔍 تصميم خانة البحث */
+.search-container {
+  position: relative;
+  margin-bottom: 24px;
+}
+
+.search-input {
+  width: 100%;
+  padding: 14px 20px 14px 48px;
+  font-size: 17px;
+  border: none;
+  border-radius: 30px;
+  background: #fff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  outline: none;
+  transition: all 0.2s ease;
+  text-align: right;
+  direction: rtl;
+}
+
+.search-input:focus {
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+}
+
+.search-icon {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  opacity: 0.6;
+}
+
+/* Floating Add Button */
+.add-btn {
+  position: fixed;
+  bottom: 32px;
+  right: 32px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #6b7f4f;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+   box-shadow: 0 8px 20px rgba(160, 190, 191, 0.4);
+  cursor: pointer;
+  z-index: 100;
+}
+
+.add-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 10px 24px rgba(0, 122, 255, 0.4);
+}
+
+.add-btn img {
+  width: 24px;
+  height: 24px;
+  filter: brightness(0) invert(1);
+}
+
+/* 🔹 بطاقة التصنيف */
+.category-card {
+  background: #fff;
+  border-radius: 30px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  transition: all 0.2s ease;
+  cursor: grab;
+  direction: rtl;
+}
+
+.category-card:hover {
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+  transform: translateY(-2px);
+}
+
+/* محتوى البطاقة */
+.category-content {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex: 1;
+}
+
+.category-info {
+  flex: 1;
+  text-align: right;
+  direction: rtl;
+  min-width: 0;
+}
+
+.category-info h3 {
+  margin: 0 0 6px;
+  font-size: 18px;
+  font-weight: 600;
+  color: #493c33;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.category-section {
+  font-size: 14px;
+  color: #d15c1d;
+  font-weight: 500;
+}
+
+.category-desc {
+  margin: 4px 0 0;
+  font-size: 14px;
+  color: #6b7f4f;
+  line-height: 1.4;
+}
+
+.category-slug {
+  font-size: 13px;
+  color: #6e6e73;
+  margin-top: 4px;
+}
+
+/* الأزرار */
+.category-actions {
+  display: flex;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.edit-btn,
+.delete-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.edit-btn {
+  background: #fff;
+}
+
+.edit-btn:hover {
+  background: #fff;
+}
+
+.delete-btn {
+  background: #fff;
+}
+
+.delete-btn:hover {
+  background: #fff;
+}
+
+.edit-btn img,
+.delete-btn img {
+  width: 18px;
+  height: 18px;
+}
+
+/* 🔹 المودال */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.modal {
+  background: #fff;
+  border-radius: 20px;
+  width: 100%;
+  max-width: 420px;
+  padding: 24px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  position: relative;
+  direction: rtl;
+  text-align: right;
+}
+
+.close-btn {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #f2f2f7;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.close-btn:hover {
+  background: #e5e5ea;
+}
+
+.close-btn img {
+  width: 16px;
+  height: 16px;
+}
+
+.modal h2 {
+  margin: 0 0 20px;
+  font-size: 20px;
+  font-weight: 600;
+  text-align: center;
+  color: #d15c1d;
+}
+
+.modal form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.modal input,
+.modal select,
+.modal textarea {
+  padding: 14px;
+  font-size: 17px;
+  border: 1px solid #f2a72d;
+  border-radius: 30px;
+  background: #fff;
+  outline: none;
+  text-align: right;
+  direction: rtl;
+  font-family: inherit;
+}
+
+.modal input:focus,
+.modal select:focus,
+.modal textarea:focus {
+  border-color: #f1ebcc;
+}
+
+.save-btn {
+  margin-top: 8px;
+  padding: 14px;
+  font-size: 17px;
+  font-weight: 600;
+  color: "#f1ebcc";
+  background: #6b7f4f;
+  border: none;
+  border-radius: 30px;
+  cursor: pointer;
+  width: 100%;
+}
+
+.save-btn:hover {
+  background: #6b7f4f;
+}
+
+.save-btn:disabled {
+  background: #6b7f4f;
+  cursor: not-allowed;
+}
+
+.no-categories {
+  text-align: center;
+  color: #a0bebf;
+  font-size: 16px;
+  margin-top: 40px;
+}
+
+/* 💻 الأجهزة الكبيرة */
+@media (min-width: 768px) {
+  .category-card {
+    padding: 16px 24px;
+    min-width: 600px;
+    max-width: 900px;
+    margin: 0 auto 18px;
+  }
+
+  .category-info h3 {
+    font-size: 18px;
+  }
+
+  .category-actions {
+    gap: 16px;
+  }
+
+  .edit-btn,
+  .delete-btn {
+    width: 44px;
+    height: 44px;
+  }
+}

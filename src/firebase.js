@@ -1,0 +1,63 @@
+//src/firebase.js
+
+import { initializeApp } from "firebase/app";
+import { onMessage } from "firebase/messaging";
+import { getMessaging, getToken } from "firebase/messaging";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyB6lOJS5aY5wOkjYlib9bl5YAMu9jLsM-g",
+  authDomain: "poise-dc7b7.firebaseapp.com",
+  projectId: "poise-dc7b7",
+  storageBucket: "poise-dc7b7.firebasestorage.app",
+  messagingSenderId: "589037198223",
+  appId: "1:589037198223:web:a044cdf653163e1a4949fa",
+};
+
+const app = initializeApp(firebaseConfig);
+export const messaging = getMessaging(app);
+
+// 🟢 دالة لطلب صلاحية الإشعارات وحفظ الـtoken في الباك إند
+export const requestNotificationPermission = async (userId) => {
+  try {
+    const vapidKey = process.env.REACT_APP_VAPID_KEY;
+    const token = await getToken(messaging, { vapidKey });
+
+    if (token) {
+      console.log("🔑 fcmToken:", token);
+     await fetch(`${process.env.REACT_APP_API_BASE}/users/${userId}/fcm-token`, {
+
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ fcmToken: token }),
+      });
+    } else {
+      console.warn("⚠️ المستخدم لم يمنح إذن الإشعارات");
+    }
+  } catch (err) {
+    console.error("❌ فشل في طلب الإذن للإشعارات:", err);
+  }
+};
+
+export const listenToMessages = (onNotification) => {
+  onMessage(messaging, (payload) => {
+    console.log("📩 إشعار مباشر:", payload);
+
+    const title = payload?.notification?.title || "إشعار جديد";
+    const body = payload?.notification?.body || "";
+
+    // 🔹 تمرير الإشعار إلى React (داخل الموقع)
+    if (onNotification) {
+      onNotification({ title, body });
+    }
+
+    // 🔹 إشعار النظام (خارج الموقع)
+    if (Notification.permission === "granted") {
+      new Notification(title, {
+        body,
+        icon: "/logo192.png", // يمكنك وضع شعار موقعك هنا
+        vibrate: [100, 50, 100],
+        tag: "order-update",
+      });
+    }
+  });
+};

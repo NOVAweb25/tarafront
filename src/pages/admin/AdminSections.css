@@ -1,0 +1,433 @@
+/* AdminSections.css */
+.admin-layout {
+  display: flex;
+  flex-direction: row-reverse;
+  min-height: 100vh;
+  background: #f1ebcc;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.admin-sections-container {
+  flex: 1;
+    background: #f1ebcc;
+  padding: 24px;
+  max-width: 1000px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* 🔍 تصميم حديث لخانة البحث */
+.search-container {
+  position: relative;
+  margin-bottom: 24px;
+}
+
+.search-input {
+  width: 100%;
+  padding: 14px 20px 14px 48px;
+  font-size: 17px;
+  border: none;
+  border-radius: 30px;
+  background: #fff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  outline: none;
+  transition: all 0.2s ease;
+  text-align: right;
+  direction: rtl;
+}
+
+.search-input:focus {
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+}
+
+.search-icon {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  opacity: 0.6;
+}
+
+/* Floating Add Button */
+.add-btn {
+  position: fixed;
+  bottom: 32px;
+  right: 32px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #6b7f4f;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 20px rgba(160, 190, 191, 0.4);
+
+  cursor: pointer;
+  z-index: 100;
+}
+
+.add-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 20px rgba(160, 190, 191, 0.4);
+
+}
+
+.add-btn img {
+  width: 24px;
+  height: 24px;
+  filter: brightness(0) invert(1);
+}
+
+/* Section Card */
+.section-card {
+  background: #fff;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  transition: all 0.2s ease;
+  cursor: grab;
+}
+
+.section-card:hover {
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+  transform: translateY(-2px);
+}
+
+.section-content {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex: 1;
+  direction: rtl;
+}
+
+.section-image img {
+  width: 70px;
+  height: 70px;
+  border-radius:30px;
+  object-fit: cover;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.section-info {
+  flex: 1;
+  text-align: right;
+  direction: rtl;
+  min-width: 0;
+}
+
+.section-info h3 {
+  margin: 0 0 6px;
+  font-size: 18px;
+  font-weight: 600;
+  color: #d15c1d;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.section-desc {
+  margin: 0;
+  font-size: 14px;
+  color: #493c33;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  position: relative;
+}
+
+.read-more {
+  color: #007aff;
+  font-weight: 600;
+  cursor: pointer;
+  margin-right: 4px;
+}
+
+.read-more:hover {
+  text-decoration: underline;
+}
+
+/* Action Buttons */
+.section-actions {
+  display: flex;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.edit-btn,
+.delete-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.edit-btn {
+  background: #a0bebf;
+}
+
+.edit-btn:hover {
+  background: #a0bebf;
+}
+
+.delete-btn {
+  background: #a0bebf;
+}
+
+.delete-btn:hover {
+  background: #a0bebf;
+}
+
+.edit-btn img,
+.delete-btn img {
+  width: 18px;
+  height: 18px;
+}
+
+/* Modal */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.modal {
+  background: #a0bebf;
+  border-radius: 20px;
+  width: 100%;
+  max-width: 420px;
+  padding: 24px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  position: relative;
+  direction: rtl;
+  text-align: right;
+}
+
+.close-btn {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #f2f2f7;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.close-btn:hover {
+  background: #e5e5ea;
+}
+
+.close-btn img {
+  width: 16px;
+  height: 16px;
+}
+
+.modal h2 {
+  margin: 0 0 20px;
+  font-size: 20px;
+  font-weight: 600;
+  text-align: center;
+  color: #a0bebf;
+}
+
+.image-picker {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 16px;
+  cursor: pointer;
+}
+
+.image-circle {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: #6b7f4f;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.image-circle img {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+}
+
+.image-circle img[src^="blob:"],
+.image-circle img[src^="http"] {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.image-picker span {
+  font-size: 14px;
+  color: #493c33;
+  font-weight: 500;
+}
+
+.modal form input,
+.modal form textarea {
+  width: 100%;
+  padding: 14px;
+  font-size: 17px;
+  border: 1px solid #f2a72d;
+  border-radius: 30px;
+  background: #FFF;
+  outline: none;
+  margin-bottom: 16px;
+  text-align: right;
+  direction: rtl;
+  font-family: inherit;
+}
+
+.modal form input:focus,
+.modal form textarea:focus {
+  border-color: #f2a72d;
+}
+
+.modal form textarea {
+  resize: none;
+}
+
+.save-btn {
+  margin-top: 8px;
+  padding: 14px;
+  font-size: 17px;
+  font-weight: 600;
+  color: white;
+  background: #6b7f4f;
+  border: none;
+  border-radius: 30px;
+  cursor: pointer;
+  width: 100%;
+}
+
+.save-btn:hover {
+  background: #6b7f4f;
+}
+
+.save-btn:disabled {
+  background: #6b7f4f;
+  cursor: not-allowed;
+}
+
+.no-sections {
+  text-align: center;
+  color: #86868b;
+  font-size: 16px;
+  margin-top: 40px;
+}
+
+/* تصميم أفقي للبطاقة (افتراضي للجوال) */
+.section-card.horizontal {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-direction: row-reverse;
+  padding: 14px 16px;
+  width: 100%;
+  margin-bottom: 14px;
+  box-sizing: border-box;
+  border-radius: 14px;
+}
+
+/* الصورة */
+.section-card.horizontal .section-image img {
+  width: 70px;
+  height: 70px;
+  border-radius: 30px;
+  object-fit: cover;
+}
+
+/* الاسم */
+.section-card.horizontal .section-name {
+  flex: 1;
+  text-align: right;
+  padding: 0 10px;
+}
+
+.section-card.horizontal .section-name h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #493c33;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* الأزرار */
+.section-card.horizontal .section-actions {
+  display: flex;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.section-card.horizontal .edit-btn,
+.section-card.horizontal .delete-btn {
+  width: 38px;
+  height: 38px;
+}
+
+/* 💻 للأجهزة الكبيرة فقط */
+@media (min-width: 768px) {
+  .section-card.horizontal {
+    padding: 16px 24px;
+    min-width: 600px;
+    max-width: 900px;
+    margin: 0 auto 18px;
+  }
+
+  .section-card.horizontal .section-image img {
+    width: 80px;
+    height: 80px;
+  }
+
+  .section-card.horizontal .section-name h3 {
+    font-size: 18px;
+  }
+
+  .section-card.horizontal .section-actions {
+    gap: 16px;
+  }
+
+  .section-card.horizontal .edit-btn,
+  .section-card.horizontal .delete-btn {
+    width: 44px;
+    height: 44px;
+  }
+}

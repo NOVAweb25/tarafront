@@ -1,0 +1,138 @@
+.review-page {
+  min-height: 100vh;
+  padding: 30px;
+  background: #f1ebcc;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+/* 🟦 صندوق رأي */
+.review-card {
+  width: 100%;
+  max-width: 400px;
+  padding: 25px;
+  background: rgba(160, 190, 191, 0.4); /* a0bebf */
+  backdrop-filter: blur(10px);
+  border-radius: 30px;
+  border: 1px solid rgba(255,255,255,0.3);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+}
+
+/* 🔹 اسم المستخدم */
+.name-box {
+  background: rgba(255,255,255,0.5);
+  padding: 12px;
+  border-radius: 12px;
+  margin-bottom: 15px;
+  color: #6b7f4f;  /* لون اسم المستخدم */
+  font-size: 16px;
+  font-weight: 600;
+  text-align: right;
+}
+
+.name-box .placeholder {
+  color: #d15c1d;
+}
+
+/* ✍️ مربع كتابة الرأي */
+.review-input {
+  width: 100%;
+  height: 120px;
+  border-radius: 30px;
+  border: 1px solid #f2a72d;
+  padding: 12px;
+  resize: none;
+  margin-bottom: 15px;
+  font-size: 15px;
+  color: #493c33; /* لون نص الرأي */
+  direction: rtl;
+  background: #fff;
+}
+
+/* ⭐ النجوم */
+.stars-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.star {
+  font-size: 30px;
+  cursor: pointer;
+  margin: 0 4px;
+  color: #a0bebf; /* خلفية النجم قبل التحديد */
+  transition: 0.2s;
+}
+
+.star.active {
+  background: linear-gradient(45deg, #d15c1d, #f2a72d);
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  transform: scale(1.2);
+}
+
+/* زر إرسال */
+.submit-btn {
+  width: 100%;
+  padding: 14px;
+  background: #6b7f4f;
+  color: #f1ebcc;
+  border: none;
+  border-radius:30px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.submit-btn:hover {
+  opacity: 0.9;
+}
+
+/* 🌟 نافذة تسجيل الدخول */
+.auth-bottom-sheet {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #a0bebf;
+  border-radius: 30px 25px 0 0;
+  padding: 25px;
+  box-shadow: 0 -4px 15px rgba(0,0,0,0.2);
+  z-index: 999;
+  text-align: center;
+}
+
+.auth-message {
+  font-size: 16px;
+  margin-bottom: 15px;
+}
+
+.auth-button {
+  width: 100%;
+  padding: 14px;
+  background: #6b7f4f;
+  color: #f1ebcc;
+  border: none;
+  border-radius: 30px;
+  margin-bottom: 10px;
+  font-size: 16px;
+}
+.auth-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  z-index: 999;
+}
+
+.auth-close {
+  background: transparent;
+  color: #493c33;
+  border: none;
+  font-size: 16px;
+  margin-top: 5px;
+}
