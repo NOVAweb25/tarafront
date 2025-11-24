@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { colors, fonts, fontSizes, buttonSizes } from "../utils/theme";
-import backgroundVideo from "../assets/autumn.mp4";
+
 
 const Home = () => {
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
@@ -20,9 +20,10 @@ const Home = () => {
   return (
     <div style={styles.container}>
       {/* 🎥 خلفية الفيديو */}
-      <video autoPlay loop muted playsInline style={styles.video}>
-        <source src={backgroundVideo} type="video/mp4" />
-      </video>
+    <video autoPlay loop muted playsInline style={styles.video}>
+  <source src="https://res.cloudinary.com/dp1bxbice/video/upload/v1763968652/autumn_vqplhl.mp4" type="video/mp4" />
+</video>
+
 
       {/* 🌫️ الطبقة الشفافة والمحتوى */}
       <div style={styles.overlay}>

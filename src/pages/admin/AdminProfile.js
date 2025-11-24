@@ -1,9 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import AdminSidebar from "../../components/AdminSidebar";
-import SearchIcon from "../../assets/search.svg";
-import EditIcon from "../../assets/edit.svg";
-import ImageIcon from "../../assets/image.svg";
 import "./AdminProfile.css";
 import { getCurrentUser, updateUser } from "../../api/api";
 
@@ -14,6 +11,9 @@ const AdminProfile = () => {
   const [previewUrl, setPreviewUrl] = useState(null);
   const fileInputRef = useRef(null);
    const [saving, setSaving] = useState(false);
+ const SearchIcon = "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968618/search_ke1zur.svg";
+const ImageIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968571/image_anmq2j.svg";
+const EditIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968570/edit_xmyhv0.svg";
 
   // 🟢 تحميل بيانات المستخدم
   useEffect(() => {

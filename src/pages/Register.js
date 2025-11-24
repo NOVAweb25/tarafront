@@ -3,8 +3,6 @@ import { useNavigate, Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { registerUser } from "../api/api";
 import { colors, fonts, fontSizes, buttonSizes } from "../utils/theme";
-import backgroundVideo from "../assets/background.mp4";
-import backIcon from "../assets/home.svg";
 import {
   MapContainer,
   TileLayer,
@@ -14,7 +12,7 @@ import {
 } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
-
+const backIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968570/home_sngijz.svg";
 // إصلاح أيقونة Marker الافتراضية
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -33,6 +31,7 @@ const DraggableMarker = ({ position, setCoords, setFormLocation }) => {
       setFormLocation(`${lat},${lng}`);
     },
   });
+const backgroundVideo = "https://res.cloudinary.com/dp1bxbice/video/upload/v1763968598/background_y4wbuh.mp4";
 
   const eventHandlers = {
     dragend() {
@@ -202,9 +201,10 @@ const handleMapClick = () => {
 
   return (
     <div style={styles.container}>
-      <video autoPlay loop muted playsInline style={styles.video}>
-        <source src={backgroundVideo} type="video/mp4" />
-      </video>
+     <video autoPlay loop muted playsInline style={styles.video}>
+  <source src="https://res.cloudinary.com/dp1bxbice/video/upload/v1763968598/background_y4wbuh.mp4" />
+</video>
+
 
       {/* 🔔 تنبيه علوي */}
       <AnimatePresence>

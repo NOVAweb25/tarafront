@@ -1,8 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import AdminSidebar from "../../components/AdminSidebar";
-import ImageIcon from "../../assets/image.svg";
-import EditIcon from "../../assets/edit.svg";
 import {
   createBankDetail,
   getBankDetails,
@@ -36,6 +34,8 @@ const AdminBank = () => {
   const [barcodePreview, setBarcodePreview] = useState(null);
   const [isBarcodeChanged, setIsBarcodeChanged] = useState(false);
   const barcodeInputRef = useRef(null);
+const ImageIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968571/image_anmq2j.svg";
+const EditIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968570/edit_xmyhv0.svg";
   useEffect(() => {
     loadBank();
   }, []);

@@ -10,11 +10,7 @@ import {
   uploadPaymentProof,
   createOrderWithProof,
 } from "../../api/api";
-import editIcon from "../../assets/edit.svg";
-import deleteIcon from "../../assets/delete.svg";
 import BottomNav from "../../components/BottomNav";
-import plusIcon from "../../assets/plus.svg";
-import minusIcon from "../../assets/minus.svg";
 import jsQR from "jsqr";
 import { useNavigate } from "react-router-dom";
 import { Copy } from "lucide-react";
@@ -30,6 +26,11 @@ const Checkout = () => {
   const [receipt, setReceipt] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
     const [submitting, setSubmitting] = useState(false);
+const plusIcon = "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968591/plus_xwrg7i.svg";
+const minusIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968578/minus_rpgpcr.svg";
+const editIcon = "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968570/edit_xmyhv0.svg";
+const deleteIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968568/delete_kf2kz4.svg";
+
   const [editData, setEditData] = useState({
     firstName: "",
     lastName: "",

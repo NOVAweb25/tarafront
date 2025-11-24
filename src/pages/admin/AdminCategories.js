@@ -9,11 +9,7 @@ import {
   getSections,
 } from "../../api/api";
 import "./AdminCategories.css";
-import SearchIcon from "../../assets/search.svg";
 import PlusIcon from "../../assets/plus.svg";
-import EditIcon from "../../assets/edit.svg";
-import DeleteIcon from "../../assets/delete.svg";
-import CloseIcon from "../../assets/close.svg";
 
 const AdminCategories = () => {
   const [categories, setCategories] = useState([]);
@@ -29,7 +25,11 @@ const AdminCategories = () => {
   });
   const [isUploading, setIsUploading] = useState(false);
   const modalRef = useRef(null);
+const DeleteIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968568/delete_kf2kz4.svg";
+const CloseIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968567/close_mcygjs.svg";
 
+const SearchIcon = "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968618/search_ke1zur.svg";
+const EditIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968570/edit_xmyhv0.svg";
   useEffect(() => {
     fetchSections();
   }, []);

@@ -1,14 +1,16 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import "./Footer.css";
-import logo from "../assets/logo.gif";
 
 // ⭐ استيراد الأيقونات من assets
-import tiktokIcon from "../assets/tiktok.svg";
-import instaIcon from "../assets/instagram.svg";
-import emailIcon from "../assets/email.svg";
+
 
 const Footer = () => {
+const tiktokIcon = "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968619/tiktok_iykumk.svg";
+const emailIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968570/email_tfb6md.svg";
+const instaIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968572/instagram_ngizeh.svg";
+const logo= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968581/logo_revtav.svg";
+
   return (
     <footer className="footer-container">
 

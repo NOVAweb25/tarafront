@@ -9,8 +9,6 @@ import {
   updateUsername,
   updatePassword,
 } from "../../api/api";
-import editIcon from "../../assets/edit.svg";
-import closeIcon from "../../assets/close.svg";
 import "./Account.css";
 
 const Account = () => {
@@ -20,6 +18,8 @@ const Account = () => {
   const [editField, setEditField] = useState(null);
   const [locationDetected, setLocationDetected] = useState(false);
    const [sheetError, setSheetError] = useState("");
+const editIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968570/edit_xmyhv0.svg";
+const closeIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968567/close_mcygjs.svg";
 
   const [editModal, setEditModal] = useState(null);
   const [step, setStep] = useState(1);

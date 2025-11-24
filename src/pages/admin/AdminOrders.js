@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import searchIcon from "../../assets/search.svg";
-import invoiceIcon from "../../assets/invoice.svg";
+
 import { Share2 } from "lucide-react";
 import { getOrders, getOrderById, updateOrder } from "../../api/api";
 import "./AdminOrders.css";
@@ -19,6 +18,9 @@ const AdminOrders = () => {
   const [invoiceData, setInvoiceData] = useState(null);
   const [activeStatusMenu, setActiveStatusMenu] = useState(null);
   const filterRef = useRef(null);
+const SearchIcon = "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968618/search_ke1zur.svg";
+
+const invoiceIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968572/invoice_kkbd8p.svg";
 
   const statuses = [
     "بانتظار تأكيد الطلب",
@@ -154,7 +156,8 @@ console.log("🔍 API_BASE =", API_BASE);
             onChange={(e) => setSearch(e.target.value)}
             className="search-input wide"
           />
-          <img src={searchIcon} alt="بحث" className="search-icon" />
+          <img src={SearchIcon} alt="بحث" className="search-icon" />
+
         </div>
         <div className="filterContainer">
           <select

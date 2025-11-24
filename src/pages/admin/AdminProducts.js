@@ -10,12 +10,7 @@ import {
   getSections,
 } from "../../api/api";
 import "./AdminProducts.css";
-import SearchIcon from "../../assets/search.svg";
 import PlusIcon from "../../assets/plus.svg";
-import EditIcon from "../../assets/edit.svg";
-import DeleteIcon from "../../assets/delete.svg";
-import ImageIcon from "../../assets/image.svg";
-import CloseIcon from "../../assets/close.svg";
 const API_BASE = process.env.REACT_APP_API_BASE;
 
 
@@ -42,7 +37,12 @@ const AdminProducts = () => {
   });
   const [deletedImages, setDeletedImages] = useState([]);
   const [isUploading, setIsUploading] = useState(false);
+const DeleteIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968568/delete_kf2kz4.svg";
+const CloseIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968567/close_mcygjs.svg";
   const modalRef = useRef(null);
+const ImageIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968571/image_anmq2j.svg";
+const EditIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968570/edit_xmyhv0.svg";
+ const SearchIcon = "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968618/search_ke1zur.svg";
   const imageModalRef = useRef(null);
   useEffect(() => {
     const loadData = async () => {

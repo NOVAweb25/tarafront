@@ -2,12 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence, useAnimation } from "framer-motion";
 import { colors, fonts, iconSizes } from "../utils/theme";
-import logo from "../assets/logo.gif";
-import productIcon from "../assets/productMang.svg";
-import accountIcon from "../assets/person.svg";
-import statsIcon from "../assets/dashboard.svg";
-import toggleIcon from "../assets/back.svg";
-import bellIcon from "../assets/notification.svg";
+
 import { logoutUser, getNotifications } from "../api/api";
 import { messaging } from "../firebase";
 import { onMessage } from "firebase/messaging";
@@ -23,7 +18,12 @@ const AdminSidebar = () => {
   const [toast, setToast] = useState(null);
   const navigate = useNavigate();
    const [pendingOrdersCount, setPendingOrdersCount] = useState(0);
-
+   const productIcon = "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968618/productMang_p66aul.svg";
+const accountIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968580/person_vmkenv.svg";
+const bellIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968579/notification_h8b8au.svg";
+const statsIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968567/close_mcygjs.svg";
+const logo= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968581/logo_revtav.svg";
+const toggleIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968565/back_xur01t.svg";
   const handleLogout = async () => {
     try {
       await logoutUser().catch(() => {});

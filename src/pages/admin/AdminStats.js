@@ -4,7 +4,6 @@ import { getStats, getReviews } from "../../api/api";
 import { colors, fonts, fontSizes } from "../../utils/theme";
 import { motion } from "framer-motion";
 import AdminSidebar from "../../components/AdminSidebar";
-import dashboardIcon from "../../assets/dashboard.svg";
 import {
   LineChart,
   Line,
@@ -34,6 +33,7 @@ const AdminStats = () => {
     const res = await getStats();
     setStats(res.data);
   };
+const dashboardIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968567/close_mcygjs.svg";
 
   const fetchReviews = async () => {
     const res = await getReviews();

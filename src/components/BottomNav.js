@@ -7,17 +7,14 @@ import {
   removeFavorite,
   addToCart,
 } from "../api/api";
-import homeIcon from "../assets/home.svg";
-import cartIcon from "../assets/cart.svg";
-import favIcon from "../assets/like.svg";
-import trashIcon from "../assets/delete.svg";
-import plusIcon from "../assets/plus.svg";
-import minusIcon from "../assets/minus.svg";
 import cartAddIcon from "../assets/cart.svg";
 import { useNavigate } from "react-router-dom";
 import { PanelTopClose, PanelRightClose } from "lucide-react";
 
 import "./BottomNav.css";
+const plusIcon = "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968591/plus_xwrg7i.svg";
+const minusIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968578/minus_rpgpcr.svg";
+const trashIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968568/delete_kf2kz4.svg";
 const BottomNav = () => {
   const [user, setUser] = useState(null);
   const [cart, setCart] = useState([]);
@@ -29,7 +26,9 @@ const BottomNav = () => {
   const [screenHeight, setScreenHeight] = useState(window.innerHeight);
   const navigate = useNavigate();
    const [layoutMode, setLayoutMode] = useState("vertical");
-
+const homeIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968570/home_sngijz.svg";
+const favIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968573/like_eclk8w.svg";
+const cartIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968566/cart_jsj3mh.svg";
 const API_BASE = process.env.REACT_APP_API_BASE; 
 const CLOUDINARY_BASE = process.env.REACT_APP_CLOUDINARY_BASE;
 

@@ -3,14 +3,16 @@ import { useNavigate, Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { loginUser } from "../api/api";
 import { colors, fonts, fontSizes, buttonSizes } from "../utils/theme";
-import backgroundVideo from "../assets/background.mp4";
-import backIcon from "../assets/home.svg";
+
 
 const Login = () => {
   const [form, setForm] = useState({ username: "", password: "" });
   const navigate = useNavigate();
   const [hoverBack, setHoverBack] = useState(false);
     const [alertMessage, setAlertMessage] = useState("");
+const backgroundVideo = "https://res.cloudinary.com/dp1bxbice/video/upload/v1763968598/background_y4wbuh.mp4";
+const backIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968570/home_sngijz.svg";
+
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });

@@ -1,8 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import accountIcon from "../assets/person.svg";
-import logo from "../assets/logo.gif";
 import { logoutUser } from "../api/api";
 import { listenToMessages } from "../firebase";
 
@@ -17,7 +15,9 @@ const ClientNavbar = () => {
   active: false,
   message: "",
 });
+const accountIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968580/person_vmkenv.svg";
 
+const logo= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968581/logo_revtav.svg";
 
 
 useEffect(() => {

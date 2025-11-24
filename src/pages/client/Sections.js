@@ -10,7 +10,7 @@ import {
   removeFromCart,
   getUserById,
 } from "../../api/api";
-import SearchIcon from "../../assets/search.svg";
+
 import CloseIcon from "../../assets/close.svg";
 import CartIcon from "../../assets/cart.svg";
 import "./Sections.css";
@@ -39,6 +39,8 @@ const Sections = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const sectionsRef = useRef(null);
+const SearchIcon = "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968618/search_ke1zur.svg";
+
 
   const rawUser = localStorage.getItem("user");
   const user = rawUser ? JSON.parse(rawUser) : null;

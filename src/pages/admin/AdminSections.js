@@ -8,12 +8,7 @@ import {
 } from "../../api/api";
 import "./AdminSections.css";
 import AdminSidebar from "../../components/AdminSidebar";
-import SearchIcon from "../../assets/search.svg";
 import PlusIcon from "../../assets/plus.svg";
-import EditIcon from "../../assets/edit.svg";
-import DeleteIcon from "../../assets/delete.svg";
-import ImageIcon from "../../assets/image.svg";
-import CloseIcon from "../../assets/close.svg";
 
 const API_BASE = process.env.REACT_APP_API_BASE; // ✅ من env
 
@@ -29,6 +24,11 @@ const AdminSections = () => {
   });
   const [isUploading, setIsUploading] = useState(false);
   const modalRef = useRef(null);
+   const SearchIcon = "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968618/search_ke1zur.svg";
+const ImageIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968571/image_anmq2j.svg";
+const EditIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968570/edit_xmyhv0.svg";
+const DeleteIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968568/delete_kf2kz4.svg";
+const CloseIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968567/close_mcygjs.svg";
 
   // 🟢 جلب الأقسام عند الفتح
   useEffect(() => {
@@ -180,6 +180,7 @@ const AdminSections = () => {
             className="search-input"
           />
           <img src={SearchIcon} alt="بحث" className="search-icon" />
+
         </div>
 
         {/* ➕ زر الإضافة */}

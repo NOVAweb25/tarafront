@@ -1,11 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { getMyOrders, addToCart, addFavorite } from "../../api/api";
-import searchIcon from "../../assets/search.svg";
-import invoiceIcon from "../../assets/invoice.svg";
-import closeIcon from "../../assets/close.svg"; 
 import { Share2 } from "lucide-react";
-import cartIcon from "../../assets/cart.svg";
 import BottomNav from "../../components/BottomNav";
 import { getUserById } from "../../api/api";
 import "./MyOrders.css";
@@ -22,6 +18,8 @@ const MyOrders = () => {
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
   const [userFavorites, setUserFavorites] = useState([]);
+const invoiceIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968572/invoice_kkbd8p.svg";
+const closeIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968567/close_mcygjs.svg";
 
   const statuses = [
     "بانتظار تأكيد الطلب",
@@ -38,7 +36,8 @@ const MyOrders = () => {
     if (path.startsWith("http")) return path; // Cloudinary
     return `${API_BASE}${path}`; // سيرفر
   };
-
+ const SearchIcon = "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968618/search_ke1zur.svg";
+const cartIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968566/cart_jsj3mh.svg";
   useEffect(() => {
     const delayDebounce = setTimeout(() => {
       if (user?._id) loadOrders();
@@ -158,7 +157,8 @@ const MyOrders = () => {
         {/* 🔍 شريط البحث والفلاتر */}
         <div className="search-wrapper">
           <div className="search-box">
-            <img src={searchIcon} alt="search" />
+           <img src={SearchIcon} alt="بحث" className="search-icon" />
+
             <input
               type="text"
               placeholder="بحث برقم الطلب"
