@@ -33,7 +33,7 @@ const AdminStats = () => {
     const res = await getStats();
     setStats(res.data);
   };
-const dashboardIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968567/close_mcygjs.svg";
+const dashboardIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968567/dashboard_ajzvsa.svg";
 
   const fetchReviews = async () => {
     const res = await getReviews();

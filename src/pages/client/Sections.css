@@ -58,7 +58,7 @@
 .section-card {
   flex: 0 0 auto;
   width: 120px;
-  background: "#a0bebf";
+  background: "#fff";
   border-radius: 20px 20px 0 0;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
   padding: 12px;
@@ -740,6 +740,37 @@
   color: #8B1E3F;
   white-space: nowrap;
 }
+
+/* 🔹 صف العنوان + زر الكل */
+.header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  padding: 0 4px;
+}
+
+.show-all-button {
+  margin: 15px auto;
+  padding: 10px 22px;
+  width: fit-content;
+  background: #a0bebf;
+  color: #493C33;
+  font-weight: 700;
+  font-size: 15px;
+  border-radius: 30px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+  text-align: center;
+  cursor: pointer;
+  transition: 0.25s ease;
+}
+
+.show-all-button:hover {
+  transform: scale(1.07);
+  background: #f2a72d;
+  color: #6b7f4f;
+}
+
 /* 🛒❤️ السلة والمفضلة */
 .product-actions-row {
   width: 100%;

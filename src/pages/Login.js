@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { loginUser } from "../api/api";
@@ -13,6 +13,12 @@ const Login = () => {
 const backgroundVideo = "https://res.cloudinary.com/dp1bxbice/video/upload/v1763968598/background_y4wbuh.mp4";
 const backIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968570/home_sngijz.svg";
 
+useEffect(() => {
+  return () => {
+    // يلغي أي تايمر قبل مغادرة الصفحة
+    setAlertMessage("");
+  };
+}, []);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });

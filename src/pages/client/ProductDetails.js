@@ -10,6 +10,8 @@ import {
 import cartIcon from "../../assets/cart.svg";
 import arrowIcon from "../../assets/arrow-right.svg";
 import "./ProductDetails.css";
+import { AnimatePresence } from "framer-motion";
+
 
 const API_BASE = process.env.REACT_APP_API_BASE; // ✅ من env
 
@@ -21,6 +23,8 @@ const ProductDetails = () => {
   const [userFavorites, setUserFavorites] = useState([]);
   const [userCart, setUserCart] = useState([]);
   const [showAlert, setShowAlert] = useState(false);
+   const [showAuthModal, setShowAuthModal] = useState(false);
+
   const [alertMessage, setAlertMessage] = useState("");
 
   const user = JSON.parse(localStorage.getItem("user") || "null");
@@ -76,7 +80,11 @@ const ProductDetails = () => {
 
   // ❤️ المفضلة
   const handleFavorite = async () => {
-    if (!userId) return;
+    if (!userId) {
+  setShowAuthModal(true);
+  return;
+}
+
     try {
       const isFav = userFavorites.includes(product._id);
       if (isFav) {
@@ -95,7 +103,11 @@ const ProductDetails = () => {
 
   // 🛒 السلة
   const handleAddToCart = async () => {
-    if (!userId) return;
+   if (!userId) {
+  setShowAuthModal(true);
+  return;
+}
+
     try {
       await addToCart(userId, {
         product: product._id,
@@ -232,6 +244,35 @@ const ProductDetails = () => {
           {alertMessage}
         </motion.div>
       )}
+{/* 🌟 نافذة الانضمام (Bottom Sheet) */}
+<AnimatePresence>
+  {showAuthModal && (
+    <motion.div
+      className="auth-bottom-sheet"
+      initial={{ y: "100%" }}
+      animate={{ y: 0 }}
+      exit={{ y: "100%" }}
+      transition={{ duration: 0.3 }}
+    >
+      <p className="auth-message">انضم إلينا لتجربة التسوق الكاملة</p>
+
+      <button
+        className="auth-button"
+        onClick={() => (window.location.href = "/register")}
+      >
+        سجّل الآن
+      </button>
+
+      <button
+        className="auth-close"
+        onClick={() => setShowAuthModal(false)}
+      >
+        إغلاق
+      </button>
+    </motion.div>
+  )}
+</AnimatePresence>
+
     </div>
   );
 };

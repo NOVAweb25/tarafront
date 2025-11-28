@@ -133,12 +133,15 @@ useEffect(() => {
           isAdmin ? (
             <Navigate to="/admin/stats" replace />
           ) : (
-           <ClientLayout>
+<ClientLayout>
   <Home />
-  <Sections />
-  <Review />   {/* 👈 تمت الإضافة هنا */}
-  <BottomNav /> 
+  <div id="sections">
+    <Sections />
+  </div>
+  <Review />
+  <BottomNav />
 </ClientLayout>
+
           )
         }
       />

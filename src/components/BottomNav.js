@@ -596,38 +596,35 @@ boxShadow: "0 8px 25px rgba(0,0,0,0.15)",
     background: "rgba(0,0,0,0.45)",
     zIndex: 1200,
   },
- sheet: {
+sheet: {
   position: "fixed",
   bottom: 0,
   left: 0,
-  right: 0,
-  width: "100%",
+  width: "100vw",                 // ⬅️  يملأ عرض الجوال كامل
   background: "#a0bebf",
   borderTopLeftRadius: "30px",
   borderTopRightRadius: "30px",
   boxShadow: "0 -4px 15px rgba(0,0,0,0.25)",
-  padding: "20px",
+  padding: "5px",
   zIndex: 1300,
 
-  // ✅ بدل maxHeight إلى ارتفاع ثابت
-  height: "400px",
+  height: "60vh",                 // ⬅️  ياخذ 85% من ارتفاع الشاشة (خلاص ما يختفي)
+  maxHeight: "85vh",              // ⬅️  يمنع القصّ في جوالات صغيرة
 
-  // ✅ حتى لا يمتد المحتوى ويظهر سكرول داخلي
   overflow: "hidden",
-
   display: "flex",
   flexDirection: "column",
-  justifyContent: "flex-start",
-  alignItems: "stretch",
 },
 
-  scroll: {
+
+scroll: {
   flex: 1,
-    overflowY: "auto",         // ✅ التمرير العمودي
-  overflowX: "hidden",       // ✅ لا تمرير أفقي
+  overflowY: "auto",
+  overflowX: "hidden",
   paddingRight: "6px",
-  WebkitOverflowScrolling: "touch", // ✅ تمرير ناعم على الجوال
+  WebkitOverflowScrolling: "touch",
 },
+
   toast: {
     position: "fixed",
     bottom: "90px",
@@ -651,42 +648,53 @@ title: {
 },
 
   emptyText: { textAlign: "center", color: "#f1ebcc ", marginTop: "20px" },
-  card: {
-    display: "flex",
-    alignItems: "center",
-    background: "#f1ebcc",
-    borderRadius: "30px",
-    boxShadow: "0 2px 6px rgba(0,0,0,0.08)",
-    padding: "8px",
-    gap: "10px",
-  },
-  image: {
-    width: "70px",
-    height: "70px",
-    borderRadius: "30px",
-    objectFit: "cover",
-    border: "1px solid #f2a72d",
-  },
-  details: { flex: 1 },
-  name: { fontSize: "0.95rem",color: "#493c33", fontWeight: "600", marginBottom: "4px" },
-  price: { color: "#493c33", fontWeight: "500" },
-  actions: {
-    display: "flex",
-    alignItems: "center",
-    gap: "6px",
-    marginTop: "4px",
-  },
-  qtyBtn: {
-    backgroundColor: "#fff",
-    borderRadius: "50%",
-    boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-    border: "none",
-    padding: "5px",
-    cursor: "pointer",
-  },
-  deleteIcon: { width: "50px", height: "30px", cursor: "pointer" },
+card: {
+  display: "flex",
+  alignItems: "center",
+  gap: "10px",
+  background: "#f1ebcc",
+  borderRadius: "20px",
+  padding: "10px",
+  boxShadow: "0 2px 6px rgba(0,0,0,0.08)",
+},
+name: { fontSize: "0.9rem", fontWeight: "600", color: "#493c33" },
+
+price: { fontSize: "0.8rem", fontWeight: "500", color: "#493c33" },
+
+image: {
+  width: "60px",
+  height: "60px",
+  borderRadius: "18px",
+  objectFit: "cover",
+  border: "1px solid #f2a72d",
+},
+
+details: { 
+  flex: 1,
+  display: "flex",
+  flexDirection: "column",
+  gap: "5px",
+},
+
+
+qtyBtn: {
+  backgroundColor: "#fff",
+  borderRadius: "50%",
+  width: "28px",
+  height: "28px",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+  border: "none",
+  padding: "0",
+  cursor: "pointer",
+},
+
+  deleteIcon: { width: "28px", height: "28px", cursor: "pointer" },
+smallIcon: { width: "22px", height: "22px", cursor: "pointer" },
+
   favActions: { display: "flex", gap: "22px", alignItems: "center" },
-  smallIcon: { width: "22px", height: "22px", cursor: "pointer" },
   footer: {
     marginTop: "10px",
     display: "flex",
@@ -705,4 +713,20 @@ title: {
     color: "#f1ebcc",
     cursor: "pointer",
   },
+
+"@media (max-width: 430px)": {
+  sheet: {
+    width: "100vw",
+    height: "75vh",
+  },
+  card: {
+    padding: "8px",
+    gap: "8px",
+  },
+  image: {
+    width: "55px",
+    height: "55px",
+  }
+}
+
 };

@@ -254,6 +254,51 @@
   height: 14px;
   opacity: 0.6;
 }
+
+
+/* 🌟 نافذة الانضمام (Bottom Sheet) */
+.auth-bottom-sheet {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  color: #f1ebcc;
+  background: #a0bebf;
+  border-top-left-radius: 30px;
+  border-top-right-radius: 30px;
+  box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.15);
+  padding: 20px;
+  text-align: center;
+  z-index: 9999;
+}
+
+.auth-message {
+  font-size: 16px;
+  color: #333;
+  margin-bottom: 16px;
+}
+
+.auth-button {
+  background: linear-gradient(90deg, #6b7f4f, #6b7f4f);
+  color: #f1ebcc;
+  border: none;
+  border-radius: 30px;
+  padding: 10px 20px;
+  font-size: 15px;
+  cursor: pointer;
+  margin-bottom: 8px;
+  width: 100%;
+}
+
+.auth-close {
+  background: none;
+  border: none;
+  color: #6b7f4f;
+  font-size: 14px;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
 @media (max-width: 480px) {
   .product-card {
     padding: 12px;

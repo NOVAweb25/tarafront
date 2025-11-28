@@ -258,26 +258,9 @@ setProducts(data);
 
 
   // ✅ إلغاء التحديد عند النقر خارج الأقسام
- useEffect(() => {
-  const handleClickOutside = (event) => {
-    const clickedOutsideSections =
-      sectionsRef.current && !sectionsRef.current.contains(event.target);
 
-    const clickedOutsideCategories =
-      categoriesRef.current && !categoriesRef.current.contains(event.target);
 
-    if (clickedOutsideSections && clickedOutsideCategories) {
-      setSelectedSection(null);
-      setSelectedCategory(null);
-      setCategories([]);
-    }
-  };
 
-  document.addEventListener("mousedown", handleClickOutside);
-  return () => {
-    document.removeEventListener("mousedown", handleClickOutside);
-  };
-}, []);
 
 
   const filteredSections = sections.filter(
@@ -361,8 +344,11 @@ setProducts(data);
   const openDetails = (section) => setExpandedSection(section);
   const closeDetails = () => setExpandedSection(null);
 
-  return (
-    <div className="sections-container">
+ return (
+  <div className="sections-container">
+
+    {/* ⭐ العنوان + زر الكل في نفس السطر */}
+    <div className="header-row">
       <motion.h2
         className="page-title"
         initial={{ x: -200, opacity: 0 }}
@@ -371,6 +357,22 @@ setProducts(data);
       >
         خدماتنا
       </motion.h2>
+
+      {selectedSection && (
+        <div
+          className="show-all-button"
+          onClick={() => {
+            setSelectedSection(null);
+            setSelectedCategory(null);
+            setCategories([]);
+          }}
+        >
+          الكل
+        </div>
+      )}
+    </div>
+
+
 
       {/* 🧩 الأقسام */}
       <div className="sections-scroll" ref={sectionsRef}>
@@ -430,6 +432,7 @@ onClick={() => {
           ))}
         </motion.div>
       )}
+
 
       {loading && <p className="loading-text">جاري تحميل المنتجات...</p>}
 

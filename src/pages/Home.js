@@ -40,9 +40,18 @@ const Home = () => {
 
           {/* 🔗 زر تسجيل الدخول */}
           {!user && (
-            <Link to="/login" style={styles.button}>
-              تسجيل الدخول
-            </Link>
+           <button
+  style={styles.button}
+  onClick={() => {
+    const section = document.getElementById("sections");
+    if (section) {
+      section.scrollIntoView({ behavior: "smooth" });
+    }
+  }}
+>
+  🌿 ابدأ رحلتك
+</button>
+
           )}
 
           {/* رابط التسجيل */}
