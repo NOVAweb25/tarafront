@@ -16,6 +16,7 @@ const AdminSidebar = () => {
   const [toast, setToast] = useState(null);
   const navigate = useNavigate();
   const [pendingOrdersCount, setPendingOrdersCount] = useState(0);
+const API_BASE = process.env.REACT_APP_API_BASE;
 
   const productIcon =
     "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968618/productMang_p66aul.svg";
@@ -40,15 +41,16 @@ const handleLogout = () => {
  
 
   const loadNotifications = async () => {
-    try {
-      const res = await axios.get(
-        "http://localhost:5000/api/orders?status=بانتظار تأكيد الطلب"
-      );
-      setPendingOrdersCount(res.data.length);
-    } catch (err) {
-      console.error("خطأ أثناء جلب الطلبات:", err);
-    }
-  };
+  try {
+    const res = await axios.get(
+      `${API_BASE}/orders?status=بانتظار تأكيد الطلب`
+    );
+    setPendingOrdersCount(res.data.length);
+  } catch (err) {
+    console.error("خطأ أثناء جلب الطلبات:", err);
+  }
+};
+
 
   useEffect(() => {
     loadNotifications();
