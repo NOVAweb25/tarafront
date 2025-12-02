@@ -116,11 +116,12 @@ useEffect(() => {
         const res = await getProducts({ sectionId: normalizeId(selectedSection._id) });
 
         const data = res.data
-  .filter((p) => p.stock > 0)
-  .map((p) => ({
-    ...p,
-    mainImage: getImageUrl(p.mainImage),
-  }));
+  // لا نحذف المنتجات، فقط نعرضها كلها
+.map((p) => ({
+  ...p,
+  mainImage: getImageUrl(p.mainImage),
+}));
+
 setProducts(data);
 
         
@@ -446,8 +447,8 @@ onClick={() => {
         >
           {products.map((product, index) => (
             <motion.div
-              key={product._id}
-              className="product-card"
+  key={product._id}
+  className={`product-card ${product.stock === 0 ? "out-of-stock" : ""}`}
               initial={{ opacity: 0, y: 40 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: index * 0.08 }}
@@ -470,26 +471,43 @@ onClick={() => {
                 <span className="product-price">{product.price} ر.س</span>
               </div>
 
-              <div className="product-actions">
-                <motion.div
-                  whileTap={{ scale: 0.9 }}
-                  className="action-btn"
-                  onClick={() => handleAddToCart(product)}
-                >
-                  <img src={CartIcon} alt="cart" />
-                </motion.div>
-                <motion.div
-                  whileTap={{ scale: 0.9 }}
-                  className={`action-btn heart ${
-                    userFavorites.includes(product._id) ? "active" : ""
-                  }`}
-                  onClick={() => handleFavorite(product)}
-                >
-                  <span className="heart-symbol">
-                    {userFavorites.includes(product._id) ? "❤" : "♡"}
-                  </span>
-                </motion.div>
-              </div>
+           <div className="product-actions">
+  {/* 🔥 المنتج منتهي المخزون */}
+  {product.stock === 0 ? (
+    <motion.div
+      whileTap={{ scale: 0.9 }}
+      className="action-btn notify-btn"
+      onClick={() => {
+        setAlertMessage(`سوف نعلمك عند توفر "${product.name}" 🔔`);
+        setShowAlert(true);
+        setTimeout(() => setShowAlert(false), 2500);
+      }}
+    >
+      <span className="notify-text">🔔 أرغب به</span>
+    </motion.div>
+  ) : (
+    /* 🛒 المنتج متاح */
+    <motion.div
+      whileTap={{ scale: 0.9 }}
+      className="action-btn"
+      onClick={() => handleAddToCart(product)}
+    >
+      <img src={CartIcon} alt="cart" />
+    </motion.div>
+  )}
+
+  {/* ❤️ المفضلة */}
+  <motion.div
+    whileTap={{ scale: 0.9 }}
+    className={`action-btn heart ${userFavorites.includes(product._id) ? "active" : ""}`}
+    onClick={() => handleFavorite(product)}
+  >
+    <span className="heart-symbol">
+      {userFavorites.includes(product._id) ? "❤" : "♡"}
+    </span>
+  </motion.div>
+</div>
+
             </motion.div>
           ))}
         </motion.div>
