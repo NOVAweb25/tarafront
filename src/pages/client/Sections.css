@@ -20,7 +20,6 @@
   0 0 15px rgba(160, 190, 191, 0.8),
   0 0 30px rgba(160, 190, 191, 0.7),
   0 0 45px rgba(160, 190, 191, 0.6);
-
   font-size: 15px;
   outline: none;
   background: #a0bebf;
@@ -80,7 +79,6 @@
 .section-image-wrapper {
   width: 70px;
   height: 70px;
-  
   border-radius: 50%;
   overflow: hidden;
   border: 2px solid #f2a72d;
@@ -108,15 +106,14 @@
   line-height: 1.4;
   display: none;
 }
-
 /* 🎨 عند تحديد القسم */
 .section-card.selected .section-description {
   display: block;
-  color: #f1ebcc;   /* ← اللون المطلوب */
+  color: #f1ebcc; /* ← اللون المطلوب */
 }
 /* 📂 التصنيفات */
 .categories-scroll {
-    
+ 
   display: flex;
   gap: 10px;
   overflow-x: auto;
@@ -130,13 +127,13 @@
 }
 .category-card {
   flex: 0 0 auto;
-  background: #a0bebf;              /* الخلفية المطلوبة */
+  background: #a0bebf; /* الخلفية المطلوبة */
   border-radius: 30px;
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
   padding: 10px 18px;
   font-size: 14px;
   font-weight: 600;
-  color: #493c33;                   /* النص */
+  color: #493c33; /* النص */
   cursor: pointer;
   transition: all 0.3s ease;
   text-align: center;
@@ -145,14 +142,12 @@
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
-
 .category-card.selected {
-  background: #f2a72d !important;   /* الخلفية الذهبية */
-  color: #6b7f4f !important;        /* نص عشبي */
+  background: #f2a72d !important; /* الخلفية الذهبية */
+  color: #6b7f4f !important; /* نص عشبي */
   transform: scale(1.05);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
 }
-
 .no-categories {
   color: #6b7f4f;
   font-size: 14px;
@@ -222,7 +217,7 @@
 /* 🛍️ المنتجات */
 .products-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr); /* صفين تناسب الجوال */
+  grid-template-columns: repeat(2, 1fr); /* صفين للجوال */
   gap: 16px;
   margin-top: 20px;
   overflow-y: auto;
@@ -460,7 +455,6 @@
   cursor: pointer;
   text-decoration: underline;
 }
-
 /* ✅ تنبيه إضافة المنتج للسلة - من الأعلى */
 .cart-alert {
   position: fixed;
@@ -480,7 +474,6 @@
   pointer-events: none;
   animation: slideDownFade 2.5s ease forwards;
 }
-
 /* ✨ الحركة: يظهر من الأعلى ثم يختفي */
 @keyframes slideDownFade {
   0% {
@@ -500,8 +493,6 @@
     transform: translate(-50%, -40px);
   }
 }
-
-
 /* 🛒 نافذة السلة (Bottom Sheet) */
 .cart-bottom-sheet {
   position: fixed;
@@ -629,7 +620,6 @@
 .action-circle:hover {
   transform: scale(1.1);
 }
-
 /* ✨ تأثير انيميشن الظهور */
 @keyframes slideUp {
   from {
@@ -690,7 +680,7 @@
 .product-card {
   background: #a0bebf;
   border-radius: 30px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
   padding: 12px;
   display: flex;
   flex-direction: column;
@@ -699,7 +689,7 @@
 }
 .product-card:hover {
   transform: translateY(-3px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.15);
 }
 /* 🖼️ الصورة */
 .product-image-wrapper {
@@ -740,7 +730,6 @@
   color: #8B1E3F;
   white-space: nowrap;
 }
-
 /* 🔹 صف العنوان + زر الكل */
 .header-row {
   display: flex;
@@ -749,7 +738,6 @@
   margin-bottom: 12px;
   padding: 0 4px;
 }
-
 .show-all-button {
   margin: 15px auto;
   padding: 10px 22px;
@@ -764,50 +752,17 @@
   cursor: pointer;
   transition: 0.25s ease;
 }
-
 .show-all-button:hover {
   transform: scale(1.07);
   background: #f2a72d;
   color: #6b7f4f;
 }
-
-/* 🛒❤️ السلة والمفضلة */
-.product-actions-row {
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 6px;
-}
-.action-btn {
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  background: #fff;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: 0.3s ease;
-}
-.action-btn img {
-  width: 22px;
-  height: 22px;
-  opacity: 0.9;
-}
-.action-btn:hover {
-  transform: scale(1.1);
-  box-shadow: 0 5px 12px rgba(0, 0, 0, 0.25);
-}
-
 /* 🔥 بطاقة المنتج عند نفاذ المخزون */
 .product-card.out-of-stock {
   background: #A0BEBF !important;
   opacity: 1;
   position: relative;
 }
-
 /* ⭐ شريط (نفد المخزون) فوق الصورة */
 .product-card.out-of-stock::after {
   content: "نفد المخزون";
@@ -821,14 +776,12 @@
   font-size: 12px;
   font-weight: bold;
 }
-
-/* 🔔 زر أرغب به */
-/* 🔔 زر أرغب به */
+/* 🔔 زر أرغب به (أصغر حجمًا) */
 .notify-btn {
-  width: 100%;
-  padding: 10px 14px;
+  width: auto; /* عرض تلقائي حسب المحتوى */
+  padding: 6px 12px; /* padding أصغر ليكون أصغر */
   background: #f2a72d !important; /* أصفر خريفي */
-  border-radius: 30px;            /* ← زوايا ناعمة */
+  border-radius: 30px; /* ← زوايا ناعمة */
   color: #493c33;
   font-weight: 700;
   text-align: center;
@@ -838,13 +791,11 @@
   justify-content: center;
   gap: 6px; /* مسافة بين الأيقونة والنص */
   cursor: pointer;
+  font-size: 13px; /* حجم نص أصغر */
 }
-
 .notify-text {
-  font-size: 15px;
+  font-size: 13px; /* نص أصغر */
 }
-
-
 /* ❤️ تفاعل المفضلة */
 .heart-btn .heart-symbol {
   font-size: 22px;
@@ -854,4 +805,29 @@
 .heart-btn.active .heart-symbol {
   transform: scale(1.15);
   text-shadow: 0 0 6px rgba(255, 77, 109, 0.5);
+}
+/* Media Queries لتكييف العرض على الشاشات المختلفة */
+@media (min-width: 600px) { /* للآيباد الصغير (مثل iPad Mini) */
+  .products-grid {
+    grid-template-columns: repeat(3, 1fr); /* 3 أعمدة */
+    gap: 50px; /* زيادة المسافة لتجنب التداخل */
+  }
+}
+@media (min-width: 768px) { /* للآيباد العادي */
+  .products-grid {
+    grid-template-columns: repeat(4, 1fr); /* 4 أعمدة */
+    gap: 50px; /* زيادة المسافة لتجنب التداخل */
+  }
+}
+@media (min-width: 1024px) { /* للآيباد برو أو لاب توب صغير */
+  .products-grid {
+    grid-template-columns: repeat(5, 1fr); /* 5 أعمدة */
+    gap: 50px; /* زيادة المسافة لتجنب التداخل */
+  }
+}
+@media (min-width: 1200px) { /* للشاشات الكبيرة */
+  .products-grid {
+    grid-template-columns: repeat(6, 1fr); /* 6 أعمدة */
+    /* هنا مش غيرت الـ gap عشان ده لشاشات كبيرة، لكن لو عايز نزيده كمان، خليه 24px أو 32px */
+  }
 }

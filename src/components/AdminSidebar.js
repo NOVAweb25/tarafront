@@ -2,22 +2,22 @@ import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { fonts, iconSizes } from "../utils/theme";
-
 import { logoutUser } from "../api/api";
 import { messaging } from "../firebase";
 import { onMessage } from "firebase/messaging";
 import axios from "axios";
 
 const AdminSidebar = () => {
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(true);  // تصحيح الخطأ هنا
   const [openAdminMenu, setOpenAdminMenu] = useState(false);
   const [openAccountMenu, setOpenAccountMenu] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [toast, setToast] = useState(null);
   const navigate = useNavigate();
   const [pendingOrdersCount, setPendingOrdersCount] = useState(0);
-const API_BASE = process.env.REACT_APP_API_BASE;
-
+  const [position, setPosition] = useState(10);  // State جديد للموقع (right: position px)
+const sidebarRef = React.useRef(null);
+  const API_BASE = process.env.REACT_APP_API_BASE;
   const productIcon =
     "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968618/productMang_p66aul.svg";
   const accountIcon =
@@ -29,45 +29,36 @@ const API_BASE = process.env.REACT_APP_API_BASE;
   const toggleIcon =
     "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968565/back_xur01t.svg";
 
-const handleLogout = () => {
-  // 🔥 بث حدث تسجيل الخروج
-  window.dispatchEvent(new Event("logout"));
-
-  // 🔥 إغلاق نافذة التأكيد
-  setShowLogoutModal(false);
-};
-
-
- 
+  const handleLogout = () => {
+    // 🔥 بث حدث تسجيل الخروج
+    window.dispatchEvent(new Event("logout"));
+    // 🔥 إغلاق نافذة التأكيد
+    setShowLogoutModal(false);
+  };
 
   const loadNotifications = async () => {
-  try {
-    const res = await axios.get(
-      `${API_BASE}/orders?status=بانتظار تأكيد الطلب`
-    );
-    setPendingOrdersCount(res.data.length);
-  } catch (err) {
-    console.error("خطأ أثناء جلب الطلبات:", err);
-  }
-};
-
+    try {
+      const res = await axios.get(
+        `${API_BASE}/orders?status=بانتظار تأكيد الطلب`
+      );
+      setPendingOrdersCount(res.data.length);
+    } catch (err) {
+      console.error("خطأ أثناء جلب الطلبات:", err);
+    }
+  };
 
   useEffect(() => {
     loadNotifications();
     const interval = setInterval(loadNotifications, 15000);
-
     onMessage(messaging, (payload) => {
       const { title, body } = payload.notification;
       setToast({ title, body });
       setTimeout(() => setToast(null), 5000);
-
       if (title.includes("طلب جديد")) {
         setPendingOrdersCount((prev) => prev + 1);
       }
-
       loadNotifications();
     });
-
     return () => clearInterval(interval);
   }, []);
 
@@ -85,24 +76,36 @@ const handleLogout = () => {
           <p>{toast.body}</p>
         </motion.div>
       )}
-
-      {/* ▪️ الشريط الجانبي */}
-      <motion.div
-        animate={{
-          width: isOpen ? 240 : 60,
-          height: isOpen ? "auto" : 60,
-          borderRadius: isOpen ? "16px" : "50%",
-          padding: isOpen ? "12px 8px" : "10px",
-        }}
-        transition={{ duration: 0.4 }}
-        style={{
-          ...styles.sidebar,
-          right: "10px",
-          top: "60px",
-          overflow: "hidden",
-        }}
-      >
-        {/* ▪️ الشعار */}
+     <motion.div
+  ref={sidebarRef}
+  drag="x"  // سحب أفقي فقط
+  dragConstraints={{ left: 0, right: window.innerWidth - 240 }}  // نطاق: من اليسار لحد اليمين داخل الشاشة
+  dragMomentum={false}  // ما يتحركش لوحده
+  whileDrag={{ scale: 1.05 }}  // تصحيح الخطأ: تكبير بسيط أثناء السحب
+  onDragEnd={(e, { point }) => {
+    // حساب الموقع الجديد (left position)
+    const newLeft = point.x - 120;  // 120 = نص عرض الـ sidebar عشان يمسك من الوسط
+    // حدّد بين 0 و (عرض الشاشة - عرض الـ sidebar)
+    setPosition(Math.max(0, Math.min(newLeft, window.innerWidth - 240)));
+  }}
+  animate={{
+    width: isOpen ? 240 : 60,
+    height: isOpen ? "auto" : 60,
+    borderRadius: isOpen ? "16px" : "50%",
+    padding: isOpen ? "12px 8px" : "10px",
+    left: position,  // غيّرت لـ left بدل right
+  }}
+  transition={{ duration: 0.4 }}
+  style={{
+    ...styles.sidebar,
+    top: "60px",
+    overflow: "hidden",
+    cursor: "grab",  // يظهر كـ draggable
+    position: "fixed",  // تأكيد
+    right: "auto",  // إزالة right عشان ما يتعارضش
+  }}
+>
+        {/* باقي الكود زي ما هو – ما غيّرت حاجة تانية */}
         {isOpen && (
           <div style={styles.logoContainer}>
             <div style={styles.logoCircle}>
@@ -110,15 +113,12 @@ const handleLogout = () => {
             </div>
           </div>
         )}
-
-        {/* ▪️ القائمة */}
         {isOpen && (
           <>
             <Link to="/admin/stats" style={styles.menuItem}>
               <img src={statsIcon} alt="Stats" style={styles.icon} />
               <span style={styles.menuText}>متابعة الموقع</span>
             </Link>
-
             {/* إدارة */}
             <div style={styles.menu}>
               <div
@@ -131,7 +131,6 @@ const handleLogout = () => {
                   {openAdminMenu ? "▲" : "▼"}
                 </span>
               </div>
-
               <AnimatePresence>
                 {openAdminMenu && (
                   <motion.div
@@ -144,20 +143,16 @@ const handleLogout = () => {
                     <Link to="/admin/sections" style={styles.subMenuItem}>
                       إدارة الأقسام
                     </Link>
-
                     <Link to="/admin/categories" style={styles.subMenuItem}>
                       إدارة التصنيفات
                     </Link>
-
                     <Link to="/admin/products" style={styles.subMenuItem}>
                       إدارة المنتجات
                     </Link>
-
                     <div style={{ position: "relative" }}>
                       <Link to="/admin/orders" style={styles.subMenuItem}>
                         إدارة الطلبات
                       </Link>
-
                       {pendingOrdersCount > 0 && (
                         <span style={styles.badge}>{pendingOrdersCount}</span>
                       )}
@@ -166,7 +161,6 @@ const handleLogout = () => {
                 )}
               </AnimatePresence>
             </div>
-
             {/* حسابي */}
             <div style={styles.menu}>
               <div
@@ -179,7 +173,6 @@ const handleLogout = () => {
                   {openAccountMenu ? "▲" : "▼"}
                 </span>
               </div>
-
               <AnimatePresence>
                 {openAccountMenu && (
                   <motion.div
@@ -192,7 +185,6 @@ const handleLogout = () => {
                     <Link to="/admin/profile" style={styles.subMenuItem}>
                       إعدادات المسؤول
                     </Link>
-
                     <Link to="/admin/settings" style={styles.subMenuItem}>
                       إعدادات الدفع
                     </Link>
@@ -200,7 +192,6 @@ const handleLogout = () => {
                 )}
               </AnimatePresence>
             </div>
-
             {/* خروج */}
             <div
               style={styles.logoutButton}
@@ -210,7 +201,6 @@ const handleLogout = () => {
             </div>
           </>
         )}
-
         {/* ▪️ زر الطي */}
         <div
           style={styles.toggleButton}
@@ -223,7 +213,6 @@ const handleLogout = () => {
           />
         </div>
       </motion.div>
-
       {/* ▪️ نافذة تأكيد الخروج */}
       {showLogoutModal && (
         <div style={styles.modalOverlay}>
@@ -234,7 +223,6 @@ const handleLogout = () => {
           >
             <h3 style={styles.modalTitle}>تأكيد تسجيل الخروج</h3>
             <p style={styles.modalText}>هل أنت متأكد أنك تريد تسجيل الخروج؟</p>
-
             <div style={styles.modalButtons}>
               <button
                 style={{ ...styles.button, background: "#f1ebcc" }}
@@ -242,7 +230,6 @@ const handleLogout = () => {
               >
                 نعم
               </button>
-
               <button
                 style={{ ...styles.button, background: "#f1ebcc" }}
                 onClick={() => setShowLogoutModal(false)}
@@ -258,6 +245,8 @@ const handleLogout = () => {
 };
 
 export default AdminSidebar;
+
+
 
 
  

@@ -10,7 +10,6 @@ import {
 import cartAddIcon from "../assets/cart.svg";
 import { useNavigate } from "react-router-dom";
 import { PanelTopClose, PanelRightClose } from "lucide-react";
-
 import "./BottomNav.css";
 const plusIcon = "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968591/plus_xwrg7i.svg";
 const minusIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968578/minus_rpgpcr.svg";
@@ -29,15 +28,14 @@ const BottomNav = () => {
 const homeIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968570/home_sngijz.svg";
 const favIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968573/like_eclk8w.svg";
 const cartIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968566/cart_jsj3mh.svg";
-const API_BASE = process.env.REACT_APP_API_BASE; 
+const API_BASE = process.env.REACT_APP_API_BASE;
 const CLOUDINARY_BASE = process.env.REACT_APP_CLOUDINARY_BASE;
-
 const getImageUrl = (url) => {
   if (!url) return "";
   if (url.startsWith("http")) return url; // رابط Cloudinary
   return `${API_BASE}${url}`; // رابط من السيرفر
 };
-   
+  
   // 🟢 جلب بيانات المستخدم الحالي
   const fetchCurrentUser = async () => {
     try {
@@ -91,16 +89,14 @@ const getImageUrl = (url) => {
   // تعديل الكمية
  const updateQuantity = async (itemId, newQty) => {
   if (!user) return;
-
   if (newQty <= 0) {
     handleRemoveFromCart(itemId);
     return;
   }
-
   // 🔥 إيجاد المنتج في السلة
   const item = cart.find((i) => getItemId(i._id) === itemId);
   if (!item) return;
-
+  const currentQty = item.quantity;
   // 🔥 المخزون الحقيقي (من populate)
   const stock =
     item.product?.stock ||
@@ -108,14 +104,12 @@ const getImageUrl = (url) => {
       ? Number(item.stock.$numberInt)
       : item.stock) ||
     0;
-
-  // إذا حاول يزيد أكثر من المخزون → منع
-  if (newQty > stock) {
+  // إذا حاول يزيد أكثر من المخزون → منع (فقط عند الزيادة)
+  if (newQty > currentQty && newQty > stock) {
     setAlertMessage(` لا يمكن طلب أكثر من ${stock} للمنتج "${item.name}"`);
     setTimeout(() => setAlertMessage(""), 2500);
     return;
   }
-
   try {
     await updateCartItem(user._id, itemId, { quantity: newQty });
     await fetchCurrentUser();
@@ -123,8 +117,6 @@ const getImageUrl = (url) => {
     console.error("Failed to update quantity:", err);
   }
 };
-
-
   // حذف من السلة
   const handleRemoveFromCart = async (itemId) => {
     if (!user) return;
@@ -152,6 +144,13 @@ const getImageUrl = (url) => {
       return;
     }
     const productId = getItemId(product._id);
+    const currentItem = cart.find((i) => getItemId(i.product?._id || i.product) === productId);
+    const currentQty = currentItem ? currentItem.quantity : 0;
+    const stock = product.stock || 0;
+    if (currentQty + 1 > stock) {
+      showAlert(` لا يمكن طلب أكثر من ${stock} للمنتج "${product.name}"`);
+      return;
+    }
     try {
       await addToCart(user._id, {
         product: productId,
@@ -174,7 +173,6 @@ const getImageUrl = (url) => {
     setAlertMessage(msg);
     setTimeout(() => setAlertMessage(""), 2000);
   };
-
   const getItemId = (id) => {
     if (!id) return null;
     if (typeof id === "string") return id;
@@ -201,7 +199,6 @@ const getImageUrl = (url) => {
   >
     <img src={homeIcon} alt="Home" style={styles.icon} />
   </motion.button>
-
   {/* زر السلة */}
   <motion.button
     style={styles.iconBtn}
@@ -214,7 +211,6 @@ const getImageUrl = (url) => {
     <img src={cartIcon} alt="Cart" style={styles.icon} />
     {cart.length > 0 && <span style={styles.badge}>{cart.length}</span>}
   </motion.button>
-
   {/* زر المفضلة */}
   <motion.button
     style={styles.iconBtn}
@@ -226,7 +222,6 @@ const getImageUrl = (url) => {
   >
     <img src={favIcon} alt="Favorite" style={styles.bigFavIcon} />
   </motion.button>
-
   {/* زر تغيير الاتجاه */}
   <motion.button
     style={styles.iconBtn}
@@ -244,16 +239,11 @@ const getImageUrl = (url) => {
     )}
   </motion.button>
 </motion.div>
-
-
-
       {/* 🛒 نافذة السلة */}
       <AnimatePresence>
         {activeModal === "cart" && (
           <>
             <CartSheet
- 
-
               cart={cart}
               loading={loading}
               total={total}
@@ -273,8 +263,6 @@ const getImageUrl = (url) => {
         {activeModal === "fav" && (
           <>
            <FavSheet
-
-
               favorites={favorites}
               loading={loading}
               screenHeight={screenHeight}
@@ -343,8 +331,6 @@ const CartSheet = ({ cart, loading, total, screenHeight, setActiveModal, updateQ
           }
         }}
       >
-
-
         <div
           onPointerDown={(e) => controls.start(e)}
           style={styles.handle}
@@ -371,7 +357,6 @@ const CartSheet = ({ cart, loading, total, screenHeight, setActiveModal, updateQ
                 <div key={itemId} style={styles.card}>
                   <img
                     src={getImageUrl(item.mainImage)}
-
                     alt={item.name}
                     style={styles.image}
                   />
@@ -476,8 +461,6 @@ const FavSheet = ({ favorites, loading, screenHeight, setActiveModal, handleAddT
           }
         }}
       >
-
-
         <div
           onPointerDown={(e) => controls.start(e)}
           style={styles.handle}
@@ -500,7 +483,6 @@ const FavSheet = ({ favorites, loading, screenHeight, setActiveModal, handleAddT
                 <div key={itemId} style={styles.card}>
                   <img
                     src={getImageUrl(item.mainImage)}
-
                     alt={item.name}
                     style={styles.image}
                   />
@@ -532,8 +514,6 @@ const FavSheet = ({ favorites, loading, screenHeight, setActiveModal, handleAddT
   );
 };
 export default BottomNav;
-
-
 const styles = {
   badge: {
     position: "absolute",
@@ -558,11 +538,9 @@ backdropFilter: "blur(10px)",
 WebkitBackdropFilter: "blur(10px)", // للجوال
 border: "1px solid rgba(255,255,255,0.25)",
 boxShadow: "0 8px 25px rgba(0,0,0,0.15)",
-
   borderRadius: "30px",
   display: "flex",
   gap: "15px",
-
   ...(mode === "vertical"
     ? {
         // 🔵 وضع عامودي كامل
@@ -600,23 +578,19 @@ sheet: {
   position: "fixed",
   bottom: 0,
   left: 0,
-  width: "100vw",                 // ⬅️  يملأ عرض الجوال كامل
+  width: "100vw", // ⬅️ يملأ عرض الجوال كامل
   background: "#a0bebf",
   borderTopLeftRadius: "30px",
   borderTopRightRadius: "30px",
   boxShadow: "0 -4px 15px rgba(0,0,0,0.25)",
   padding: "5px",
   zIndex: 1300,
-
-  height: "60vh",                 // ⬅️  ياخذ 85% من ارتفاع الشاشة (خلاص ما يختفي)
-  maxHeight: "85vh",              // ⬅️  يمنع القصّ في جوالات صغيرة
-
+  height: "60vh", // ⬅️ ياخذ 85% من ارتفاع الشاشة (خلاص ما يختفي)
+  maxHeight: "85vh", // ⬅️ يمنع القصّ في جوالات صغيرة
   overflow: "hidden",
   display: "flex",
   flexDirection: "column",
 },
-
-
 scroll: {
   flex: 1,
   overflowY: "auto",
@@ -624,7 +598,6 @@ scroll: {
   paddingRight: "6px",
   WebkitOverflowScrolling: "touch",
 },
-
   toast: {
     position: "fixed",
     bottom: "90px",
@@ -644,9 +617,8 @@ title: {
   fontWeight: "700",
   marginBottom: "12px",
   textAlign: "center",
-  color: "#f1ebcc",   // ← اللون الجديد
+  color: "#f1ebcc", // ← اللون الجديد
 },
-
   emptyText: { textAlign: "center", color: "#f1ebcc ", marginTop: "20px" },
 card: {
   display: "flex",
@@ -658,9 +630,7 @@ card: {
   boxShadow: "0 2px 6px rgba(0,0,0,0.08)",
 },
 name: { fontSize: "0.9rem", fontWeight: "600", color: "#493c33" },
-
 price: { fontSize: "0.8rem", fontWeight: "500", color: "#493c33" },
-
 image: {
   width: "60px",
   height: "60px",
@@ -668,15 +638,12 @@ image: {
   objectFit: "cover",
   border: "1px solid #f2a72d",
 },
-
-details: { 
+details: {
   flex: 1,
   display: "flex",
   flexDirection: "column",
   gap: "5px",
 },
-
-
 qtyBtn: {
   backgroundColor: "#fff",
   borderRadius: "50%",
@@ -690,10 +657,8 @@ qtyBtn: {
   padding: "0",
   cursor: "pointer",
 },
-
   deleteIcon: { width: "28px", height: "28px", cursor: "pointer" },
 smallIcon: { width: "22px", height: "22px", cursor: "pointer" },
-
   favActions: { display: "flex", gap: "22px", alignItems: "center" },
   footer: {
     marginTop: "10px",
@@ -713,7 +678,6 @@ smallIcon: { width: "22px", height: "22px", cursor: "pointer" },
     color: "#f1ebcc",
     cursor: "pointer",
   },
-
 "@media (max-width: 430px)": {
   sheet: {
     width: "100vw",
@@ -728,5 +692,4 @@ smallIcon: { width: "22px", height: "22px", cursor: "pointer" },
     height: "55px",
   }
 }
-
 };

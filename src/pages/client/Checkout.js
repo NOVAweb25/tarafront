@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import React, { useEffect, useState, useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   getUserById,
   getBankDetails,
@@ -14,10 +14,7 @@ import BottomNav from "../../components/BottomNav";
 import jsQR from "jsqr";
 import { useNavigate } from "react-router-dom";
 import { Copy } from "lucide-react";
-
-
 const API_BASE = process.env.REACT_APP_API_BASE; // ✅ من env
-
 const Checkout = () => {
   const userId = JSON.parse(localStorage.getItem("user"))?._id;
   const [user, setUser] = useState(null);
@@ -25,12 +22,11 @@ const Checkout = () => {
   const [cart, setCart] = useState([]);
   const [receipt, setReceipt] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
-    const [submitting, setSubmitting] = useState(false);
-const plusIcon = "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968591/plus_xwrg7i.svg";
-const minusIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968578/minus_rpgpcr.svg";
-const editIcon = "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968570/edit_xmyhv0.svg";
-const deleteIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968568/delete_kf2kz4.svg";
-
+  const [submitting, setSubmitting] = useState(false);
+  const plusIcon = "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968591/plus_xwrg7i.svg";
+  const minusIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968578/minus_rpgpcr.svg";
+  const editIcon = "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968570/edit_xmyhv0.svg";
+  const deleteIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968568/delete_kf2kz4.svg";
   const [editData, setEditData] = useState({
     firstName: "",
     lastName: "",
@@ -41,22 +37,20 @@ const deleteIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968568
     address: "",
   });
   const [copiedField, setCopiedField] = useState(null);
+  const [alertMessage, setAlertMessage] = useState("");
   const navigate = useNavigate();
-
   // ✅ دالة لتحديد رابط الصورة الصحيح سواء من Cloudinary أو من السيرفر
   const getImageUrl = (path) => {
     if (!path) return "";
     if (path.startsWith("http")) return path;
     return `${API_BASE}${path}`;
   };
-
   useEffect(() => {
     if (userId) {
       loadUser();
       loadBanks();
     }
   }, [userId]);
-
   const loadUser = async () => {
     const res = await getUserById(userId);
     setUser(res.data);
@@ -69,7 +63,6 @@ const deleteIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968568
       address: res.data.address || "",
     });
   };
-
   const loadBanks = async () => {
     const res = await getBankDetails();
     const banksWithFullUrls = res.data.map((b) => ({
@@ -78,12 +71,10 @@ const deleteIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968568
     }));
     setBanks(banksWithFullUrls);
   };
-
   const handleRemoveItem = async (itemId) => {
     await removeFromCart(userId, itemId);
     await loadUser();
   };
-
   const handleUpdateLocation = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(async (pos) => {
@@ -108,7 +99,6 @@ const deleteIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968568
             const road = geoData.address.road || "";
             addressStr = [city, suburb, road].filter(Boolean).join(", ");
           }
-
           setEditData({
             ...editData,
             latitude,
@@ -131,16 +121,24 @@ const deleteIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968568
       alert("المتصفح لا يدعم تحديد الموقع الجغرافي");
     }
   };
-
   const handleSaveEdit = async () => {
     await updateUser(userId, editData);
     await loadUser();
     setIsEditing(false);
   };
-
   const updateQuantity = async (itemId, newQty) => {
     if (newQty <= 0) {
       await handleRemoveItem(itemId);
+      return;
+    }
+    // 🔥 المخزون الحقيقي (افترض أن stock موجود في item.product.stock)
+    const item = cart.find((i) => i._id === itemId);
+    if (!item) return;
+    const stock = item.product?.stock || 0; // أو جلب stock إذا لزم
+    // إذا newQty أكبر من stock → عرض تنبيه
+    if (newQty > stock) {
+      setAlertMessage(`لا يمكنك إضافة أكثر من ${stock} من هذا المنتج`);
+      setTimeout(() => setAlertMessage(""), 2500);
       return;
     }
     try {
@@ -150,107 +148,89 @@ const deleteIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968568
       console.error("Failed to update quantity:", err);
     }
   };
-
   const copyToClipboard = (text, field) => {
     navigator.clipboard.writeText(text);
     setCopiedField(field);
     setTimeout(() => setCopiedField(null), 2000);
   };
-
   const handleScanBarcode = () => {
-  if (!banks[0]?.barcode) return alert(" لا يوجد باركود متاح");
-
-  const img = new Image();
-  img.src = getImageUrl(banks[0].barcode);
-  img.crossOrigin = "anonymous";
-
-  img.onload = () => {
-    const canvas = document.createElement("canvas");
-    canvas.width = img.width;
-    canvas.height = img.height;
-    const ctx = canvas.getContext("2d");
-    ctx.drawImage(img, 0, 0);
-    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    const code = jsQR(imageData.data, imageData.width, imageData.height);
-
-    if (code) {
-      const qrValue = code.data.trim();
-      console.log("📦 رمز الباركود:", qrValue);
-
-      // 🟢 إذا كان الرابط يبدأ بـ http نعرضه كزر قابل للفتح
-      if (qrValue.startsWith("http")) {
-        const open = window.confirm(
-          ` تم قراءة الباركود:\n${qrValue}\n\nهل ترغب بفتح الرابط الآن؟`
-        );
-        if (open) window.open(qrValue, "_blank");
+    if (!banks[0]?.barcode) return alert(" لا يوجد باركود متاح");
+    const img = new Image();
+    img.src = getImageUrl(banks[0].barcode);
+    img.crossOrigin = "anonymous";
+    img.onload = () => {
+      const canvas = document.createElement("canvas");
+      canvas.width = img.width;
+      canvas.height = img.height;
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(img, 0, 0);
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const code = jsQR(imageData.data, imageData.width, imageData.height);
+      if (code) {
+        const qrValue = code.data.trim();
+        console.log("📦 رمز الباركود:", qrValue);
+        // 🟢 إذا كان الرابط يبدأ بـ http نعرضه كزر قابل للفتح
+        if (qrValue.startsWith("http")) {
+          const open = window.confirm(
+            ` تم قراءة الباركود:\n${qrValue}\n\nهل ترغب بفتح الرابط الآن؟`
+          );
+          if (open) window.open(qrValue, "_blank");
+        } else {
+          // 🔸 في حال كان نص وليس رابط
+          alert(`📦 رمز الباركود: ${qrValue}`);
+        }
       } else {
-        // 🔸 في حال كان نص وليس رابط
-        alert(`📦 رمز الباركود: ${qrValue}`);
+        alert(" تعذر قراءة الباركود");
       }
-    } else {
-      alert(" تعذر قراءة الباركود");
-    }
+    };
+    img.onerror = () => {
+      alert(" تعذر تحميل صورة الباركود");
+    };
   };
-
-  img.onerror = () => {
-    alert(" تعذر تحميل صورة الباركود");
-  };
-};
-
-
   const totalProducts = cart.reduce(
     (sum, item) => sum + item.price * item.quantity,
     0
   );
   const delivery = 20;
   const total = totalProducts + delivery;
-
-const handleSubmit = async () => {
-  if (!receipt) return alert("📎 يرجى إرفاق إيصال الدفع أولاً");
-
-  setSubmitting(true); // 🔵 تشغيل التحميل
-
-  const orderData = {
-    user: userId,
-    items: cart.map((item) => ({
-      product: item.product._id || item.product,
-      name: item.name,
-      price: item.price,
-      mainImage: item.mainImage,
-      quantity: item.quantity,
-    })),
-    shipping: {
-      name: `${user.firstName} ${user.lastName}`,
-      phone: user.phone,
-      address: user.address || "",
-      coords: [user.longitude, user.latitude],
-    },
-    subtotal: totalProducts,
-    tax: 0,
-    delivery,
-    total,
-  };
-
-  try {
-    const formData = new FormData();
-    formData.append("file", receipt);
-    formData.append("orderData", JSON.stringify(orderData));
-
-    const res = await createOrderWithProof(formData);
+  const handleSubmit = async () => {
+    if (!receipt) return alert("📎 يرجى إرفاق إيصال الدفع أولاً");
+    setSubmitting(true); // 🔵 تشغيل التحميل
+    const orderData = {
+      user: userId,
+      items: cart.map((item) => ({
+        product: item.product._id || item.product,
+        name: item.name,
+        price: item.price,
+        mainImage: item.mainImage,
+        quantity: item.quantity,
+      })),
+      shipping: {
+        name: `${user.firstName} ${user.lastName}`,
+        phone: user.phone,
+        address: user.address || "",
+        coords: [user.longitude, user.latitude],
+      },
+      subtotal: totalProducts,
+      tax: 0,
+      delivery,
+      total,
+    };
+    try {
+      const formData = new FormData();
+      formData.append("file", receipt);
+      formData.append("orderData", JSON.stringify(orderData));
+      const res = await createOrderWithProof(formData);
       window.dispatchEvent(new Event("cartUpdated"));
-
-    alert(" تم إرسال الطلب بنجاح");
-
-    navigate("/my-orders");
-  } catch (err) {
-    console.error(" Error:", err.response?.data || err.message);
-    alert("حدث خطأ أثناء إنشاء الطلب. حاول مرة أخرى.");
-  } finally {
-    setSubmitting(false); // 🔵 إيقاف التحميل
-  }
-};
-
-
+      alert(" تم إرسال الطلب بنجاح");
+      navigate("/my-orders");
+    } catch (err) {
+      console.error(" Error:", err.response?.data || err.message);
+      alert("حدث خطأ أثناء إنشاء الطلب. حاول مرة أخرى.");
+    } finally {
+      setSubmitting(false); // 🔵 إيقاف التحميل
+    }
+  };
   return (
     <>
       <div style={styles.page}>
@@ -362,7 +342,6 @@ const handleSubmit = async () => {
               )}
             </div>
           )}
-
           {/* 🏦 بيانات الدفع */}
           <h2 style={styles.header}>بيانات الدفع</h2>
           {banks.length > 0 && (
@@ -387,7 +366,6 @@ const handleSubmit = async () => {
   style={styles.copyIcon}
   onClick={() => copyToClipboard(banks[0].iban, "iban")}
 />
-
                 {copiedField === "iban" && (
                   <span style={styles.copiedText}>تم النسخ ✓</span>
                 )}
@@ -399,7 +377,6 @@ const handleSubmit = async () => {
   style={styles.copyIcon}
   onClick={() => copyToClipboard(banks[0].accountNumber, "account")}
 />
-
                 {copiedField === "account" && (
                   <span style={styles.copiedText}>تم النسخ ✓</span>
                 )}
@@ -409,7 +386,6 @@ const handleSubmit = async () => {
               </p>
             </div>
           )}
-
           {/* 🛍️ المنتجات */}
           <h2 style={styles.header}>المنتجات</h2>
           <div style={styles.box}>
@@ -457,7 +433,6 @@ const handleSubmit = async () => {
               <p>السلة فارغة</p>
             )}
           </div>
-
           {/* 💰 الحساب النهائي */}
           <h2 style={styles.header}>الملخص</h2>
           <div style={styles.box}>
@@ -465,7 +440,6 @@ const handleSubmit = async () => {
             <p>سعر التوصيل: {delivery} ر.س</p>
             <hr />
             <h3>الإجمالي: {total} ر.س</h3>
-
             <label style={styles.uploadLabel}>
                إرفاق إيصال الدفع (PDF)
               <input
@@ -476,7 +450,6 @@ const handleSubmit = async () => {
               />
             </label>
             {receipt && <p style={styles.fileName}>الملف: {receipt.name}</p>}
-
             <button
   style={{
     ...styles.confirmBtn,
@@ -488,18 +461,28 @@ const handleSubmit = async () => {
 >
   {submitting ? " جاري إرسال الطلب..." : " تأكيد الدفع"}
 </button>
-
           </div>
         </motion.div>
       </div>
-
       <BottomNav />
+      {/* 🔔 Toast */}
+      <AnimatePresence>
+        {alertMessage && (
+          <motion.div
+            style={styles.toast}
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 40 }}
+            transition={{ duration: 0.4 }}
+          >
+            {alertMessage}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   );
 };
-
 export default Checkout;
-
 const styles = {
   page: {
     minHeight: "100vh",
@@ -579,7 +562,6 @@ const styles = {
     border: "none",
     borderRadius: "30px",
     background: "linear-gradient(90deg,#d15c1d,#f2a72d)",
-
     fontWeight: "600",
     color: "#f1ebcc",
     marginTop: "10px",
@@ -618,5 +600,19 @@ copyIconHover: {
   copiedText: {
     color: "d15c1d",
     fontSize: "14px",
+  },
+  toast: {
+    position: "fixed",
+    bottom: "90px",
+    left: "50%",
+    transform: "translateX(-50%)",
+    background: "#d15c1d",
+    color: "#f1ebcc",
+    padding: "10px 20px",
+    borderRadius: "30px",
+    fontSize: "14px",
+    fontWeight: "600",
+    boxShadow: "0 4px 10px rgba(0,0,0,0.2)",
+    zIndex: 2000,
   },
 };

@@ -5,9 +5,7 @@ import { Share2 } from "lucide-react";
 import BottomNav from "../../components/BottomNav";
 import { getUserById } from "../../api/api";
 import "./MyOrders.css";
-
 const API_BASE = process.env.REACT_APP_API_BASE; // ✅ من env
-
 const MyOrders = () => {
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
   const [orders, setOrders] = useState([]);
@@ -18,9 +16,9 @@ const MyOrders = () => {
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
   const [userFavorites, setUserFavorites] = useState([]);
+  const [userCart, setUserCart] = useState([]);
 const invoiceIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968572/invoice_kkbd8p.svg";
 const closeIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968567/close_mcygjs.svg";
-
   const statuses = [
     "بانتظار تأكيد الطلب",
     "تم تأكيد الطلب",
@@ -29,7 +27,6 @@ const closeIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968567/
     "جاهز للاستلام",
     "تم رفض الطلب",
   ];
-
   // ✅ دالة تساعدنا في تحديد الرابط الصحيح (Cloudinary أو السيرفر)
   const getImageUrl = (path) => {
     if (!path) return "";
@@ -44,7 +41,6 @@ const cartIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968566/c
     }, 300);
     return () => clearTimeout(delayDebounce);
   }, [user, statusFilter, search]);
-
   const loadOrders = async () => {
     try {
       const res = await getMyOrders(user._id);
@@ -58,22 +54,19 @@ const cartIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968566/c
       if (statusFilter) {
         filtered = filtered.filter((o) => o.status === statusFilter);
       }
-
       // ✅ معالجة روابط الإيصالات
       filtered = filtered.map((order) => ({
         ...order,
         paymentProof: getImageUrl(order.paymentProof),
       }));
-
       setOrders(filtered);
     } catch (err) {
       console.error("Error fetching orders:", err);
     }
   };
-
   useEffect(() => {
     if (!user?._id) return;
-    const fetchUserFavorites = async () => {
+    const fetchUserData = async () => {
       try {
         const res = await getUserById(user._id);
         const userData = res.data;
@@ -81,15 +74,25 @@ const cartIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968566/c
           ? userData.favorites.map((fav) => fav._id || fav)
           : [];
         setUserFavorites(favoritesIds);
+        const cartItems = Array.isArray(userData.cart) ? userData.cart : [];
+        setUserCart(cartItems);
       } catch (err) {
         console.error("خطأ أثناء جلب بيانات المستخدم:", err);
       }
     };
-    fetchUserFavorites();
+    fetchUserData();
   }, [user]);
-
   const handleAddToCart = async (product) => {
     if (!user?._id) return;
+    const currentItem = userCart.find((i) => (i.product?._id || i.product) === product._id);
+    const currentQty = currentItem ? currentItem.quantity : 0;
+    const stock = product.stock || 0;
+    if (currentQty + 1 > stock) {
+      setAlertMessage(`لا يمكن إضافة أكثر من ${stock} من "${product.name}"`);
+      setShowAlert(true);
+      setTimeout(() => setShowAlert(false), 2500);
+      return;
+    }
     try {
       await addToCart(user._id, {
         product: product._id,
@@ -98,11 +101,24 @@ const cartIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968566/c
         mainImage: product.mainImage,
         quantity: 1,
       });
-
       setAlertMessage(`تمت إضافة "${product.name}" إلى السلة 🛒`);
       setShowAlert(true);
       setTimeout(() => setShowAlert(false), 2500);
       window.dispatchEvent(new Event("cartUpdated"));
+      // تحديث السلة المحلية
+      const updatedCart = [...userCart];
+      if (currentItem) {
+        currentItem.quantity += 1;
+      } else {
+        updatedCart.push({
+          product: { _id: product._id },
+          quantity: 1,
+          name: product.name,
+          price: product.price,
+          mainImage: product.mainImage,
+        });
+      }
+      setUserCart(updatedCart);
     } catch (err) {
       console.error("❌ خطأ أثناء إضافة المنتج للسلة:", err);
       setAlertMessage("حدث خطأ أثناء إضافة المنتج 😔");
@@ -110,7 +126,6 @@ const cartIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968566/c
       setTimeout(() => setShowAlert(false), 2500);
     }
   };
-
   const handleFavorite = async (product) => {
     if (!user?._id) return;
     try {
@@ -128,7 +143,6 @@ const cartIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968566/c
       console.error("❌ خطأ أثناء تحديث المفضلة:", err);
     }
   };
-
   const handleShareLocation = (coords) => {
     if (!coords || coords.length !== 2) return;
     const lat = coords[1];
@@ -144,13 +158,11 @@ const cartIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968566/c
       window.open(url, "_blank");
     }
   };
-
   const openReceipt = (proofUrl) => {
     if (!proofUrl) return;
     const url = getImageUrl(proofUrl);
     window.open(url, "_blank");
   };
-
   return (
     <>
       <div className="myorders-page">
@@ -158,7 +170,6 @@ const cartIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968566/c
         <div className="search-wrapper">
           <div className="search-box">
            <img src={SearchIcon} alt="بحث" className="search-icon" />
-
             <input
               type="text"
               placeholder="بحث برقم الطلب"
@@ -200,7 +211,6 @@ const cartIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968566/c
             )}
           </div>
         </div>
-
         {/* 🧾 قائمة الطلبات */}
         <AnimatePresence>
           {orders.length > 0 ? (
@@ -229,7 +239,6 @@ const cartIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968566/c
           )}
         </AnimatePresence>
       </div>
-
       {/* 🪟 نافذة التفاصيل */}
       <AnimatePresence>
         {selectedOrder && (
@@ -260,9 +269,7 @@ const cartIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968566/c
 >
   <img src={closeIcon} alt="close" className="close-icon-btn" />
 </button>
-
               </div>
-
               <div className="invoice-body">
                 {selectedOrder.shipping && (
                   <div className="client-section">
@@ -274,7 +281,6 @@ const cartIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968566/c
                       {selectedOrder.shipping.city || "غير محدد"} -{" "}
                       {selectedOrder.shipping.district || "غير محدد"}
                     </p>
-
                     {selectedOrder.shipping.coords &&
                       selectedOrder.shipping.coords.length === 2 && (
                         <div className="map-container">
@@ -306,7 +312,6 @@ const cartIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968566/c
                       )}
                   </div>
                 )}
-
                 <div className="invoice-items-section">
                   <h4>المنتجات</h4>
                   {selectedOrder.items.map((item) => {
@@ -327,7 +332,6 @@ const cartIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968566/c
                             {item.product?.price || item.price} ر.س
                           </p>
                         </div>
-
                         <div className="product-actions">
                           <motion.div
                             whileTap={{ scale: 0.9 }}
@@ -336,7 +340,6 @@ const cartIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968566/c
                           >
                             <img src={cartIcon} alt="cart" width={16} />
                           </motion.div>
-
                           <motion.div
                             whileTap={{ scale: 0.9 }}
                             className={`action-btn heart ${isFav ? "active" : ""}`}
@@ -351,7 +354,6 @@ const cartIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968566/c
                     );
                   })}
                 </div>
-
                 <div className="invoice-summary">
                   <p>
                     مجموع المنتجات: <strong>{selectedOrder.subtotal} ر.س</strong>
@@ -364,7 +366,6 @@ const cartIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968566/c
                     <strong className="total">{selectedOrder.total} ر.س</strong>
                   </h4>
                 </div>
-
                 {selectedOrder.paymentProof && (
                   <div className="receipt-box">
                     <p><strong>الإيصال المرفق:</strong></p>
@@ -381,7 +382,6 @@ const cartIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968566/c
           </>
         )}
       </AnimatePresence>
-
       {showAlert && (
         <motion.div
           className="cart-alert"
@@ -393,10 +393,8 @@ const cartIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968566/c
           {alertMessage}
         </motion.div>
       )}
-
       <BottomNav />
     </>
   );
 };
-
 export default MyOrders;
