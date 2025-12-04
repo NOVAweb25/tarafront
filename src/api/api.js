@@ -1,8 +1,21 @@
 // src/api/api.js
 import axios from "axios";
 
-const API_BASE = process.env.REACT_APP_API_BASE || "http://localhost:5000/api";
-console.log("API BASE FROM ENV:", process.env.REACT_APP_API_BASE);
+// الحل السحري اللي يشتغل على Vercel + React + كل الجوالات (حتى iOS 12)
+const API_BASE = (() => {
+  // لو المشروع Vite
+  if (typeof import?.meta?.env !== "undefined") {
+    return import.meta.env.VITE_API_BASE || "https://poiseback.onrender.com/api";
+  }
+  // لو المشروع Create React App (القديم)
+  if (typeof process !== "undefined" && process?.env?.REACT_APP_API_BASE) {
+    return process.env.REACT_APP_API_BASE;
+  }
+  // Fallback نهائي (الأهم عشان ما يحصلش crash أبدًا)
+  return "https://poiseback.onrender.com/api";
+})();
+
+console.log("API BASE URL:", API_BASE);
 
 const api = axios.create({
   baseURL: API_BASE,
@@ -11,13 +24,15 @@ const api = axios.create({
   },
 });
 
-
-// إضافة interceptor لوضع توكن المستخدم إذا موجود
+// Interceptor لإضافة التوكن تلقائيًا
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
-  if (token) config.headers.Authorization = `Bearer ${token}`;
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
   return config;
 });
+
 /* ---------------------- Auth ---------------------- */
 export const registerUser = (data) => api.post("/auth/register", data);
 export const loginUser = (data) => api.post("/auth/login", data);
