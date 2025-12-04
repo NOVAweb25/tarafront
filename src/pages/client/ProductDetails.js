@@ -6,6 +6,7 @@ import {
   getUserById,
   addFavorite,
   addToCart,
+   removeFavorite,
 } from "../../api/api";
 import cartIcon from "../../assets/cart.svg";
 import arrowIcon from "../../assets/arrow-right.svg";
@@ -79,32 +80,51 @@ const ProductDetails = () => {
   const images = [product.mainImage, ...(product.images || [])].filter(Boolean);
 
   // ❤️ المفضلة
-  const handleFavorite = async () => {
-    if (!userId) {
-  setShowAuthModal(true);
-  return;
-}
+ const handleFavorite = async () => {
+  if (!userId) {
+    setShowAuthModal(true);
+    return;
+  }
 
-    try {
-      const isFav = userFavorites.includes(product._id);
-      if (isFav) {
-        await fetch(`${API_BASE}/api/users/${userId}/favorites/${product._id}`, {
-          method: "DELETE",
-        });
-        setUserFavorites((p) => p.filter((id) => id !== product._id));
-      } else {
-        await addFavorite(userId, { productId: product._id });
-        setUserFavorites((p) => [...p, product._id]);
-      }
-    } catch (err) {
-      console.error("Error updating favorites:", err);
+  try {
+    const isFav = userFavorites.includes(product._id);
+
+    if (isFav) {
+      await removeFavorite(userId, product._id);
+      setUserFavorites((prev) => prev.filter((id) => id !== product._id));
+    } else {
+      await addFavorite(userId, { productId: product._id });
+      setUserFavorites((prev) => [...prev, product._id]);
     }
-  };
+  } catch (err) {
+    console.error("Error updating favorites:", err);
+  }
+};
+
 
   // 🛒 السلة
   const handleAddToCart = async () => {
    if (!userId) {
   setShowAuthModal(true);
+  return;
+}
+// 🛑 منع إضافة كمية تتجاوز المخزون
+const refreshedUser = await getUserById(userId);
+const freshCart = refreshedUser.data.cart || [];
+
+const cartItem = freshCart.find(
+  (item) =>
+    item.product === product._id ||
+    item.product?._id === product._id
+);
+
+const currentQty = cartItem ? cartItem.quantity : 0;
+const stock = product.stock || 0;
+
+if (currentQty + 1 > stock) {
+  setAlertMessage(`لا يمكنك إضافة أكثر من ${stock} من هذا المنتج`);
+  setShowAlert(true);
+  setTimeout(() => setShowAlert(false), 2500);
   return;
 }
 
@@ -176,26 +196,48 @@ const ProductDetails = () => {
         </div>
 
         {/* الأزرار */}
-        <div className="actions-row">
-          <motion.div
-            className="action-btn"
-            whileTap={{ scale: 0.9 }}
-            onClick={handleAddToCart}
-          >
-            <img src={cartIcon} alt="cart" />
-          </motion.div>
-          <motion.div
-            className={`action-btn heart-btn ${
-              userFavorites.includes(product._id) ? "active" : ""
-            }`}
-            whileTap={{ scale: 0.9 }}
-            onClick={handleFavorite}
-          >
-            <span className="heart-symbol">
-              {userFavorites.includes(product._id) ? "❤" : "♡"}
-            </span>
-          </motion.div>
-        </div>
+   {/* الأزرار */}
+<div className="actions-row">
+
+  {/* 🔥 لو المنتج مخزونه صفر → أرغب به */}
+  {product.stock === 0 ? (
+    <motion.div
+      className="notify-btn"
+      whileTap={{ scale: 0.9 }}
+      onClick={() => {
+        setAlertMessage(`سنعلمك عند توفر "${product.name}" 🔔`);
+        setShowAlert(true);
+        setTimeout(() => setShowAlert(false), 2500);
+      }}
+    >
+      🔔 أرغب به
+    </motion.div>
+  ) : (
+    /* 🛒 المنتج متاح */
+    <motion.div
+      className="action-btn"
+      whileTap={{ scale: 0.9 }}
+      onClick={handleAddToCart}
+    >
+      <img src={cartIcon} alt="cart" />
+    </motion.div>
+  )}
+
+  {/* ❤️ المفضلة */}
+  <motion.div
+    className={`action-btn heart-btn ${
+      userFavorites.includes(product._id) ? "active" : ""
+    }`}
+    whileTap={{ scale: 0.9 }}
+    onClick={handleFavorite}
+  >
+    <span className="heart-symbol">
+      {userFavorites.includes(product._id) ? "❤" : "♡"}
+    </span>
+  </motion.div>
+
+</div>
+
 
         {/* الوصف */}
         <p className="product-description">

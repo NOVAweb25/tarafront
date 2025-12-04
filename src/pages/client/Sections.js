@@ -155,12 +155,12 @@ setProducts(data);
   categoryId: normalizeId(category._id),
 });
 
-      const data = res.data
-  .filter((p) => p.stock > 0) // 💥 فقط المنتجات اللي فيها مخزون
-  .map((p) => ({
-    ...p,
-    mainImage: getImageUrl(p.mainImage),
-  }));
+     const data = res.data.map((p) => ({
+  ...p,
+  mainImage: getImageUrl(p.mainImage),
+}));
+
+
 setProducts(data);
 
     } catch (err) {
@@ -179,14 +179,13 @@ setProducts(data);
 
       const res = await getProducts(query);
 
-      const data = res.data
-        .filter((p) => p.stock > 0)
-        .map((p) => ({
-          ...p,
-          mainImage: p.mainImage?.startsWith("http")
-            ? p.mainImage
-            : `${API_BASE}${p.mainImage}`,
-        }));
+      const data = res.data.map((p) => ({
+  ...p,
+  mainImage: p.mainImage?.startsWith("http")
+    ? p.mainImage
+    : `${API_BASE}${p.mainImage}`,
+}));
+
 
       setProducts(data);
     } catch (e) {
@@ -240,9 +239,11 @@ setProducts(data);
     try {
       setLoading(true);
       const res = await getProducts({});
-      const data = res.data
-        .filter((p) => p.stock > 0)
-        .map((p) => ({ ...p, mainImage: getImageUrl(p.mainImage) }));
+     const data = res.data.map((p) => ({
+  ...p,
+  mainImage: getImageUrl(p.mainImage),
+}));
+
 
       setProducts(data);
     } catch (err) {
@@ -304,20 +305,25 @@ setProducts(data);
   const stock = product.stock || 0;
 
   // 🔥 شوف إذا المنتج موجود في السلة
-  const cartItem = userCart.find(
-    (item) => item.product === product._id || item.product?._id === product._id
-  );
+  // تحميل السلة مباشرة من الـ API بعد كل إضافة لضمان القيمة الحقيقية
+const refreshedUser = await getUserById(userId);
+const freshCart = refreshedUser.data.cart || [];
 
-  // الكمية الحالية
-  const currentQty = cartItem ? cartItem.quantity : 0;
+const cartItem = freshCart.find(
+  (item) =>
+    item.product === product._id ||
+    item.product?._id === product._id
+);
 
-  // إذا إضافة 1 تخليها تتعدى المخزون → منع
-  if (currentQty + 1 > stock) {
-    setAlertMessage(` الكمية المتاحة من "${product.name}" هي ${stock}`);
-    setShowAlert(true);
-    setTimeout(() => setShowAlert(false), 2500);
-    return;
-  }
+const currentQty = cartItem ? cartItem.quantity : 0;
+
+if (currentQty + 1 > stock) {
+  setAlertMessage(`لا يمكنك إضافة أكثر من ${stock} من هذا المنتج`);
+  setShowAlert(true);
+  setTimeout(() => setShowAlert(false), 2500);
+  return;
+}
+
 
   try {
     await addToCart(userId, {
@@ -473,25 +479,27 @@ onClick={() => {
 
            <div className="product-actions">
   {/* 🔥 المنتج منتهي المخزون */}
-  {product.stock === 0 ? (
-    <motion.div
-      whileTap={{ scale: 0.9 }}
-      className="action-btn notify-btn"
-      onClick={() => {
-        setAlertMessage(`سوف نعلمك عند توفر "${product.name}" 🔔`);
-        setShowAlert(true);
-        setTimeout(() => setShowAlert(false), 2500);
-      }}
-    >
-      <span className="notify-text">🔔 أرغب به</span>
-    </motion.div>
-  ) : (
-    /* 🛒 المنتج متاح */
-    <motion.div
-      whileTap={{ scale: 0.9 }}
-      className="action-btn"
-      onClick={() => handleAddToCart(product)}
-    >
+ {/* 🔥 المنتج منتهي المخزون */}
+{product.stock === 0 ? (
+  <motion.div
+    whileTap={{ scale: 0.95 }}
+    className="notify-btn"
+    onClick={() => {
+      setAlertMessage(`سوف نعلمك عند توفر "${product.name}" 🔔`);
+      setShowAlert(true);
+      setTimeout(() => setShowAlert(false), 2500);
+    }}
+  >
+    <span className="notify-text">🔔 أرغب به</span>
+  </motion.div>
+) : (
+  <motion.div
+    whileTap={{ scale: 0.9 }}
+    className="action-btn"
+    onClick={handleAddToCart}
+  >
+
+
       <img src={CartIcon} alt="cart" />
     </motion.div>
   )}

@@ -803,8 +803,8 @@
 
 /* 🔥 بطاقة المنتج عند نفاذ المخزون */
 .product-card.out-of-stock {
-  background: #ccc !important;
-  opacity: 0.6;
+  background: #A0BEBF !important;
+  opacity: 1;
   position: relative;
 }
 
@@ -823,18 +823,27 @@
 }
 
 /* 🔔 زر أرغب به */
+/* 🔔 زر أرغب به */
 .notify-btn {
-  width: auto !important;
-  padding: 6px 12px;
-  background: #f2a72d !important;
-  border-radius: 30px;
+  width: 100%;
+  padding: 10px 14px;
+  background: #f2a72d !important; /* أصفر خريفي */
+  border-radius: 30px;            /* ← زوايا ناعمة */
   color: #493c33;
-  font-weight: bold;
+  font-weight: 700;
+  text-align: center;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px; /* مسافة بين الأيقونة والنص */
+  cursor: pointer;
 }
 
 .notify-text {
-  font-size: 14px;
+  font-size: 15px;
 }
+
 
 /* ❤️ تفاعل المفضلة */
 .heart-btn .heart-symbol {
