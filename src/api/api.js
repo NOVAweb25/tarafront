@@ -1,17 +1,15 @@
 // src/api/api.js
 import axios from "axios";
 
-// الحل السحري اللي يشتغل على Vercel + React + كل الجوالات (حتى iOS 12)
+// الحل النهائي لـ Create React App (CRA) على Vercel
+// بدون import.meta ولا أي حاجة تكسر الـ build
 const API_BASE = (() => {
-  // لو المشروع Vite
-  if (typeof import?.meta?.env !== "undefined") {
-    return import.meta.env.VITE_API_BASE || "https://poiseback.onrender.com/api";
-  }
-  // لو المشروع Create React App (القديم)
-  if (typeof process !== "undefined" && process?.env?.REACT_APP_API_BASE) {
+  // أول حاجة: جرب process.env (CRA بيحطه تلقائيًا لو موجود في Vercel)
+  if (typeof process !== "undefined" && process.env && process.env.REACT_APP_API_BASE) {
     return process.env.REACT_APP_API_BASE;
   }
-  // Fallback نهائي (الأهم عشان ما يحصلش crash أبدًا)
+
+  // لو ما لقاش حاجة → استخدم الرابط الثابت (الأهم عشان ما يحصلش crash)
   return "https://poiseback.onrender.com/api";
 })();
 
@@ -24,7 +22,7 @@ const api = axios.create({
   },
 });
 
-// Interceptor لإضافة التوكن تلقائيًا
+// Interceptor للتوكن
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
   if (token) {
@@ -32,7 +30,6 @@ api.interceptors.request.use((config) => {
   }
   return config;
 });
-
 /* ---------------------- Auth ---------------------- */
 export const registerUser = (data) => api.post("/auth/register", data);
 export const loginUser = (data) => api.post("/auth/login", data);
