@@ -101,21 +101,19 @@ export const createProduct = async (formData) => {
     headers: { "Content-Type": "multipart/form-data" },
   });
 };
-
 export const getProducts = (filters = {}) =>
   api.get("/products", { params: filters });
-
-
 export const getProductById = (id) => api.get(`/products/${id}`);
-
 export const updateProduct = async (id, formData) => {
   return await api.put(`/products/${id}`, formData, {
     headers: { "Content-Type": "multipart/form-data" },
   });
 };
-
 export const deleteProduct = (id) => api.delete(`/products/${id}`);
-
+// 🔔 تسجيل الرغبة في المنتج (جديد)
+export const notifyInterest = async (productId, userId) => {
+  return await api.post(`/products/${productId}/notify-interest`, { userId });
+};
 /* ---------------------- Sessions ---------------------- */
 export const createSession = (data) => api.post("/sessions", data);
 export const getSessions = () => api.get("/sessions");

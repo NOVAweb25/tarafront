@@ -274,6 +274,29 @@ const Sections = () => {
       setTimeout(() => setShowAlert(false), 2500);
     }
   };
+  // 🔔 دالة جديدة للإشعار بالرغبة في المنتج
+  const handleNotifyInterest = async (product) => {
+    if (!userId) {
+      setShowAuthModal(true);
+      return;
+    }
+    try {
+      const response = await fetch(`${API_BASE}/products/${product._id}/notify-interest`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId }),
+      });
+      if (!response.ok) throw new Error('فشل في تسجيل الرغبة');
+      setAlertMessage(`سوف نعلمك عند توفر "${product.name}" 🔔`);
+      setShowAlert(true);
+      setTimeout(() => setShowAlert(false), 2500);
+    } catch (err) {
+      console.error("❌ Error notifying interest:", err);
+      setAlertMessage("حدث خطأ أثناء تسجيل الرغبة 😔");
+      setShowAlert(true);
+      setTimeout(() => setShowAlert(false), 2500);
+    }
+  };
   const openDetails = (section) => setExpandedSection(section);
   const closeDetails = () => setExpandedSection(null);
   return (
@@ -395,11 +418,7 @@ const Sections = () => {
                   <motion.div
                     whileTap={{ scale: 0.95 }}
                     className="notify-btn"
-                    onClick={() => {
-                      setAlertMessage(`سوف نعلمك عند توفر "${product.name}" 🔔`);
-                      setShowAlert(true);
-                      setTimeout(() => setShowAlert(false), 2500);
-                    }}
+                    onClick={() => handleNotifyInterest(product)} // ✅ اتصال بالدالة الجديدة
                   >
                     <span className="notify-text">🔔 أرغب به</span>
                   </motion.div>

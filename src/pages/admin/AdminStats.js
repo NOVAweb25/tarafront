@@ -1,4 +1,3 @@
-// src/pages/admin/AdminStats.jsx
 import React, { useEffect, useState } from "react";
 import { getStats, getReviews } from "../../api/api";
 import { colors, fonts, fontSizes } from "../../utils/theme";
@@ -17,7 +16,6 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
-
 const AdminStats = () => {
   const [stats, setStats] = useState({
     users: 0,
@@ -25,42 +23,37 @@ const AdminStats = () => {
     confirmedBookings: 0,
     pendingOrders: 0,
     cancelledOrders: 0,
-    userGrowth: [],
+    ordersGrowth: [], // ✅ تغيير إلى ordersGrowth
+    productsWithInterest: [], // ✅ إضافة الحقل الجديد
   });
   const [reviews, setReviews] = useState([]);
-
   const fetchStats = async () => {
     const res = await getStats();
     setStats(res.data);
   };
 const dashboardIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968567/dashboard_ajzvsa.svg";
-
   const fetchReviews = async () => {
     const res = await getReviews();
     setReviews(res.data);
   };
-
   useEffect(() => {
     fetchStats();
     fetchReviews();
   }, []);
-
 const orderData = [
   { name: "تم التسليم", value: stats.deliveredPercentage },
   { name: "تم الإلغاء", value: stats.cancelledPercentage },
 ];
-
   const pieColors = ["#6b7f4f", "#493c33", "#d15c1d"];
-
+  // ✅ تصفية المنتجات التي لديها راغبون (عدد > 0)
+  const interestedProducts = stats.productsWithInterest?.filter(p => p.interestedCount > 0) || [];
   return (
   <>
     {/* ✅ الشريط الجانبي العائم (خارج تدفق الصفحة) */}
     <AdminSidebar />
-
     {/* ✅ محتوى الصفحة الأساسي */}
     <div style={{ background: "#fff", minHeight: "100vh" }}>
       <div style={styles.container}>
-
   {/* أيقونة لوحة الإحصائيات */}
   <div style={styles.headerIconContainer}>
     <img src={dashboardIcon} alt="Dashboard" style={styles.headerIcon} />
@@ -80,23 +73,21 @@ const orderData = [
             <p style={styles.statLabel}>الحجوزات المؤكدة</p>
           </motion.div>
         </div>
-
         {/* --- الرسوم البيانية --- */}
         <div style={styles.chartsContainer}>
           {/* LineChart */}
           <div style={styles.chartBox}>
-            <h3 style={styles.chartTitle}> نمو المستخدمين</h3>
+            <h3 style={styles.chartTitle}> نمو الطلبات</h3> {/* ✅ تغيير العنوان إلى نمو الطلبات */}
             <ResponsiveContainer width="100%" height={250}>
-              <LineChart data={stats.userGrowth}>
+              <LineChart data={stats.ordersGrowth}> {/* ✅ تغيير data إلى ordersGrowth */}
                 <CartesianGrid stroke="#f2a72d" strokeDasharray="5 5" />
-                <XAxis dataKey="month" />
+                <XAxis dataKey="date" /> {/* ✅ تغيير dataKey إلى date (من _id في aggregation) */}
                 <YAxis />
                 <Tooltip />
-                <Line type="monotone" dataKey="users" stroke={"#f2a72d"} strokeWidth={2} />
+                <Line type="monotone" dataKey="orders" stroke={"#f2a72d"} strokeWidth={2} /> {/* ✅ تغيير dataKey إلى orders */}
               </LineChart>
             </ResponsiveContainer>
           </div>
-
           {/* PieChart */}
           <div style={styles.chartBox}>
             <h3 style={styles.chartTitle}> حالة الطلبات</h3>
@@ -115,14 +106,32 @@ const orderData = [
     <Cell key={index} fill={pieColors[index]} />
   ))}
 </Pie>
-
                 <Tooltip />
                 <Legend />
               </PieChart>
             </ResponsiveContainer>
           </div>
         </div>
-
+        {/* --- المنتجات المرغوبة (جديد) --- */}
+        <h2 style={{ ...styles.title, marginTop: "40px" }}>المنتجات المرغوبة</h2>
+        <div style={styles.interestedProductsContainer}>
+          {interestedProducts.length > 0 ? (
+            interestedProducts.map((p, index) => (
+              <motion.div
+                key={index}
+                style={styles.interestedProductCard}
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.4, delay: index * 0.1 }}
+              >
+                <span style={styles.interestedProductName}>{p.name}</span>
+                <div style={styles.interestedCountCircle}>{p.interestedCount}</div>
+              </motion.div>
+            ))
+          ) : (
+            <p style={styles.noInterested}>لا توجد منتجات مرغوبة بعد</p>
+          )}
+        </div>
         {/* --- آراء العملاء --- */}
         <h2 style={{ ...styles.title, marginTop: "40px" }}>آراء العملاء</h2>
         <div style={styles.reviewsContainer}>
@@ -150,7 +159,6 @@ const orderData = [
     </span>
   ))}
 </div>
-
               </motion.div>
             ))
           ) : (
@@ -162,9 +170,7 @@ const orderData = [
   </>
 );
 };
-
 export default AdminStats;
-
 const styles = {
   container: {
     flex: 1,
@@ -172,18 +178,15 @@ const styles = {
     padding: "15px",
     fontFamily: fonts.primary,
   },
-
 reviewRatingContainer: {
   display: "flex",
   gap: "3px",
   marginTop: "5px",
 },
-
 star: {
   fontSize: "18px",
   color: "#6b7f4f", // خلفية النجم غير المفعّل
 },
-
 starActive: {
   background: "linear-gradient(45deg, #d15c1d, #f2a72d)",
   WebkitBackgroundClip: "text",
@@ -191,7 +194,6 @@ starActive: {
   fontWeight: "bold",
   transform: "scale(1.1)",
 },
-
   title: {
     fontFamily: fonts.secondary,
     color: "#d15c1d",
@@ -274,21 +276,66 @@ starActive: {
     color: colors.highlight,
     fontWeight: "bold",
   },
-
 headerIconContainer: {
   display: "flex",
   justifyContent: "center",
   marginBottom: "20px",
 },
-
 headerIcon: {
   width: "80px", // حجم الأيقونة في الأعلى
   height: "80px",
 },
-
   noReviews: {
     textAlign: "center",
     color: "#a0bebf",
     fontSize: "14px",
+  },
+  // ✅ أنماط جديدة لقسم المنتجات المرغوبة
+  interestedProductsContainer: {
+    display: "flex",
+    overflowX: "auto",
+    gap: "15px",
+    padding: "10px 0",
+    marginBottom: "20px",
+    scrollbarWidth: "thin",
+    scrollbarColor: "#d15c1d #f1ebcc",
+  },
+  interestedProductCard: {
+    background: "#fff",
+    borderRadius: "20px",
+    padding: "10px 15px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    minWidth: "150px",
+    boxShadow: "0 3px 8px rgba(0,0,0,0.08)",
+    cursor: "pointer",
+    transition: "transform 0.3s ease",
+  },
+  interestedProductName: {
+    fontSize: "14px",
+    fontWeight: "bold",
+    color: "#493c33",
+    flex: 1,
+  },
+  interestedCountCircle: {
+    background: "#d15c1d",
+    color: "#f1ebcc",
+    borderRadius: "50%",
+    width: "30px",
+    height: "30px",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    fontSize: "14px",
+    fontWeight: "bold",
+    marginLeft: "10px",
+    boxShadow: "0 2px 6px rgba(107, 127, 79, 0.5)", // ✅ لون الظل بدرجة #6b7f4f مع opacity 0.5
+  },
+  noInterested: {
+    textAlign: "center",
+    color: "#a0bebf",
+    fontSize: "14px",
+    width: "100%",
   },
 };
