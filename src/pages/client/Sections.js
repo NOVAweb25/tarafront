@@ -9,6 +9,7 @@ import {
   updateCartItem,
   removeFromCart,
   getUserById,
+  getProductById, // ✅ أضف هذا الـ import من api/api.js إذا لزم
 } from "../../api/api";
 import CloseIcon from "../../assets/close.svg";
 import CartIcon from "../../assets/cart.svg";
@@ -103,6 +104,7 @@ const Sections = () => {
           .map((p) => ({
             ...p,
             mainImage: getImageUrl(p.mainImage),
+            stock: p.stock ?? 0, // ✅ ضمن وجود stock في الـ products state
           }));
         setProducts(data);
       } catch (err) {
@@ -127,6 +129,7 @@ const Sections = () => {
       const data = res.data.map((p) => ({
         ...p,
         mainImage: getImageUrl(p.mainImage),
+        stock: p.stock ?? 0, // ✅ ضمن stock
       }));
       setProducts(data);
     } catch (err) {
@@ -148,6 +151,7 @@ const Sections = () => {
         mainImage: p.mainImage?.startsWith("http")
           ? p.mainImage
           : `${API_BASE}${p.mainImage}`,
+        stock: p.stock ?? 0, // ✅ ضمن stock
       }));
       setProducts(data);
     } catch (e) {
@@ -194,6 +198,7 @@ const Sections = () => {
         const data = res.data.map((p) => ({
           ...p,
           mainImage: getImageUrl(p.mainImage),
+          stock: p.stock ?? 0, // ✅ ضمن stock
         }));
         setProducts(data);
       } catch (err) {
@@ -237,18 +242,27 @@ const Sections = () => {
       setShowAuthModal(true);
       return;
     }
-    // 🔥 المخزون الحقيقي
-    const stock = product.stock || 0;
-    // 🔥 شوف إذا المنتج موجود في السلة
-    // تحميل السلة مباشرة من الـ API بعد كل إضافة لضمان القيمة الحقيقية
+    // 🔥 جلب stock طازج دائمًا من API لضمان القيمة الحقيقية (حل مشكلة الـ 0)
+    let stock = 0;
+    try {
+      const productRes = await getProductById(product._id);
+      stock = productRes.data.stock ?? 0;
+    } catch (err) {
+      console.error("❌ Error fetching product stock:", err);
+      setAlertMessage("حدث خطأ أثناء التحقق من المخزون 😔");
+      setShowAlert(true);
+      setTimeout(() => setShowAlert(false), 2500);
+      return;
+    }
+    // 🔥 جلب السلة الطازجة من API
     const refreshedUser = await getUserById(userId);
     const freshCart = refreshedUser.data.cart || [];
     const cartItem = freshCart.find(
       (item) =>
-        item.product === product._id ||
-        item.product?._id === product._id
+        normalizeId(item.product?._id || item.product) === normalizeId(product._id)
     );
     const currentQty = cartItem ? cartItem.quantity : 0;
+    // 🔥 التحقق: فقط إذا الكمية الحالية +1 > stock، رفض الإضافة
     if (currentQty + 1 > stock) {
       setAlertMessage(`لا يمكنك إضافة أكثر من ${stock} من هذا المنتج`);
       setShowAlert(true);
@@ -426,7 +440,7 @@ const Sections = () => {
                   <motion.div
                     whileTap={{ scale: 0.9 }}
                     className="action-btn"
-                    onClick={handleAddToCart}
+                    onClick={() => handleAddToCart(product)} // ✅ تعديل: استخدم الدالة المعدلة
                   >
                     <img src={CartIcon} alt="cart" />
                   </motion.div>

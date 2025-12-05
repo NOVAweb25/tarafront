@@ -72,8 +72,17 @@ const Checkout = () => {
     setBanks(banksWithFullUrls);
   };
   const handleRemoveItem = async (itemId) => {
-    await removeFromCart(userId, itemId);
-    await loadUser();
+    // ✅ تحديث محلي سلس: إزالة العنصر فورًا
+    const updatedCart = cart.filter((item) => item._id !== itemId);
+    setCart(updatedCart);
+    try {
+      await removeFromCart(userId, itemId);
+      // لا إعادة جلب هنا للسلاسة
+    } catch (err) {
+      console.error("Failed to remove from cart:", err);
+      // rollback إذا فشل
+      await loadUser();
+    }
   };
   const handleUpdateLocation = () => {
     if (navigator.geolocation) {
@@ -131,9 +140,12 @@ const Checkout = () => {
       await handleRemoveItem(itemId);
       return;
     }
-    // 🔥 المخزون الحقيقي (افترض أن stock موجود في item.product.stock)
-    const item = cart.find((i) => i._id === itemId);
-    if (!item) return;
+    // 🔥 إيجاد المنتج في السلة
+    const itemIndex = cart.findIndex((i) => i._id === itemId);
+    if (itemIndex === -1) return;
+    const item = cart[itemIndex];
+    const currentQty = item.quantity;
+    // 🔥 المخزون الحقيقي (من populate)
     const stock = item.product?.stock || 0; // أو جلب stock إذا لزم
     // إذا newQty أكبر من stock → عرض تنبيه
     if (newQty > stock) {
@@ -141,11 +153,20 @@ const Checkout = () => {
       setTimeout(() => setAlertMessage(""), 2500);
       return;
     }
+    // ✅ تحديث محلي سلس (optimistic update)
+    const updatedCart = [...cart];
+    updatedCart[itemIndex] = { ...item, quantity: newQty };
+    setCart(updatedCart);
     try {
       await updateCartItem(userId, itemId, { quantity: newQty });
-      await loadUser();
+      // لا إعادة جلب هنا للسلاسة
     } catch (err) {
       console.error("Failed to update quantity:", err);
+      // ✅ rollback إذا فشل
+      updatedCart[itemIndex] = { ...item, quantity: currentQty };
+      setCart(updatedCart);
+      setAlertMessage("حدث خطأ أثناء تحديث الكمية 😔");
+      setTimeout(() => setAlertMessage(""), 2500);
     }
   };
   const copyToClipboard = (text, field) => {

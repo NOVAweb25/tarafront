@@ -25,7 +25,7 @@ const BottomNav = () => {
   const [screenHeight, setScreenHeight] = useState(window.innerHeight);
   const navigate = useNavigate();
    const [layoutMode, setLayoutMode] = useState("vertical");
-const homeIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968570/home_sngijz.svg";
+const homeIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1764962337/home_rmalaw.svg";
 const favIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968573/like_eclk8w.svg";
 const cartIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968566/cart_jsj3mh.svg";
 const API_BASE = process.env.REACT_APP_API_BASE;
@@ -35,7 +35,7 @@ const getImageUrl = (url) => {
   if (url.startsWith("http")) return url; // رابط Cloudinary
   return `${API_BASE}${url}`; // رابط من السيرفر
 };
-  
+ 
   // 🟢 جلب بيانات المستخدم الحالي
   const fetchCurrentUser = async () => {
     try {
@@ -94,8 +94,9 @@ const getImageUrl = (url) => {
     return;
   }
   // 🔥 إيجاد المنتج في السلة
-  const item = cart.find((i) => getItemId(i._id) === itemId);
-  if (!item) return;
+  const itemIndex = cart.findIndex((i) => getItemId(i._id) === itemId);
+  if (itemIndex === -1) return;
+  const item = cart[itemIndex];
   const currentQty = item.quantity;
   // 🔥 المخزون الحقيقي (من populate)
   const stock =
@@ -110,31 +111,49 @@ const getImageUrl = (url) => {
     setTimeout(() => setAlertMessage(""), 2500);
     return;
   }
+  // ✅ تحديث محلي سلس (optimistic update) للكمية والإجمالي فورًا
+  const updatedCart = [...cart];
+  updatedCart[itemIndex] = { ...item, quantity: newQty };
+  setCart(updatedCart); // يحدث الـ UI فورًا بدون إعادة تحميل
   try {
     await updateCartItem(user._id, itemId, { quantity: newQty });
-    await fetchCurrentUser();
+    // ✅ بعد نجاح الـ API، يمكن إعادة جلب إذا لزم (لكن مش ضروري للسلاسة)
+    // await fetchCurrentUser(); // أزل هذا لتجنب إعادة التحميل، اعتمد على التحديث المحلي
   } catch (err) {
     console.error("Failed to update quantity:", err);
+    // ✅ إذا فشل، عودة للقيمة القديمة (rollback)
+    updatedCart[itemIndex] = { ...item, quantity: currentQty };
+    setCart(updatedCart);
+    setAlertMessage("حدث خطأ أثناء تحديث الكمية 😔");
+    setTimeout(() => setAlertMessage(""), 2500);
   }
 };
   // حذف من السلة
   const handleRemoveFromCart = async (itemId) => {
     if (!user) return;
+    // ✅ تحديث محلي سلس: إزالة العنصر فورًا
+    const updatedCart = cart.filter((i) => getItemId(i._id) !== itemId);
+    setCart(updatedCart);
     try {
       await removeFromCart(user._id, itemId);
-      await fetchCurrentUser();
+      // await fetchCurrentUser(); // أزل للسلاسة
     } catch (err) {
       console.error("Failed to remove from cart:", err);
+      // rollback إذا فشل (لكن نادر)
+      await fetchCurrentUser(); // فقط إذا فشل، أعد جلب
     }
   };
   // حذف من المفضلة
   const handleRemoveFavorite = async (productId) => {
     if (!user) return;
+    // ✅ تحديث محلي سلس
+    const updatedFavorites = favorites.filter((f) => getItemId(f._id) !== productId);
+    setFavorites(updatedFavorites);
     try {
       await removeFavorite(user._id, productId);
-      await fetchCurrentUser();
     } catch (err) {
       console.error("Failed to remove favorite:", err);
+      await fetchCurrentUser();
     }
   };
   // إضافة من المفضلة إلى السلة
@@ -144,13 +163,30 @@ const getImageUrl = (url) => {
       return;
     }
     const productId = getItemId(product._id);
-    const currentItem = cart.find((i) => getItemId(i.product?._id || i.product) === productId);
-    const currentQty = currentItem ? currentItem.quantity : 0;
+    const currentItemIndex = cart.findIndex((i) => getItemId(i.product?._id || i.product) === productId);
+    const currentQty = currentItemIndex !== -1 ? cart[currentItemIndex].quantity : 0;
     const stock = product.stock || 0;
     if (currentQty + 1 > stock) {
       showAlert(` لا يمكن طلب أكثر من ${stock} للمنتج "${product.name}"`);
       return;
     }
+    // ✅ تحديث محلي سلس: إضافة أو زيادة الكمية فورًا
+    const updatedCart = [...cart];
+    if (currentItemIndex !== -1) {
+      updatedCart[currentItemIndex] = {
+        ...updatedCart[currentItemIndex],
+        quantity: currentQty + 1,
+      };
+    } else {
+      updatedCart.push({
+        product: productId,
+        name: product.name,
+        price: typeof product.price === "object" ? Number(product.price.$numberInt) : product.price,
+        mainImage: product.mainImage,
+        quantity: 1,
+      });
+    }
+    setCart(updatedCart);
     try {
       await addToCart(user._id, {
         product: productId,
@@ -162,11 +198,12 @@ const getImageUrl = (url) => {
         mainImage: product.mainImage,
         quantity: 1,
       });
-      await fetchCurrentUser();
       showAlert("تمت إضافة المنتج إلى السلة");
     } catch (err) {
       console.error("Failed to add to cart:", err);
       showAlert("فشل في إضافة المنتج");
+      // rollback
+      await fetchCurrentUser();
     }
   };
   const showAlert = (msg) => {

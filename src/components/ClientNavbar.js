@@ -15,7 +15,7 @@ const ClientNavbar = () => {
   active: false,
   message: "",
 });
-const accountIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968580/person_vmkenv.svg";
+const accountIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1764962209/person_iwqjor.svg";
 
 const logo= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968581/logo_revtav.svg";
 
@@ -346,8 +346,8 @@ const styles = {
   },
 
   icon: {
-    width: "35px",
-    height: "35px",
+    width: "60px",
+    height: "60px",
       },
 
   userName: {
