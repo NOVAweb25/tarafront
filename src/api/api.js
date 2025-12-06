@@ -1,17 +1,9 @@
 // src/api/api.js
 import axios from "axios";
 
-// الحل النهائي لـ Create React App (CRA) على Vercel
-// بدون import.meta ولا أي حاجة تكسر الـ build
-const API_BASE = (() => {
-  // أول حاجة: جرب process.env (CRA بيحطه تلقائيًا لو موجود في Vercel)
-  if (typeof process !== "undefined" && process.env && process.env.REACT_APP_API_BASE) {
-    return process.env.REACT_APP_API_BASE;
-  }
+const API_BASE = process.env.REACT_APP_API_BASE || "https://poiseback.onrender.com/api";
 
-  // لو ما لقاش حاجة → استخدم الرابط الثابت (الأهم عشان ما يحصلش crash)
-  return "https://poiseback.onrender.com/api";
-})();
+
 
 console.log("API BASE URL:", API_BASE);
 
@@ -214,3 +206,11 @@ export const getReviews = () => api.get("/reviews");
 export const getStats = () => api.get("/stats");
 
 export default api;
+
+/*----------------------Pyment------------------------*/
+export const createCardPayment = (data) =>
+  api.post("/payment/create-payment", data);
+
+export const chargeSavedCard = (data) =>
+  api.post("/payment/charge-saved-card", data);
+

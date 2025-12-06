@@ -21,7 +21,7 @@ const sidebarRef = React.useRef(null);
   const productIcon =
     "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968618/productMang_p66aul.svg";
   const accountIcon =
-    "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968580/person_vmkenv.svg";
+    "https://res.cloudinary.com/dp1bxbice/image/upload/v1764962209/person_iwqjor.svg";
   const statsIcon =
     "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968567/dashboard_ajzvsa.svg";
   const logo =

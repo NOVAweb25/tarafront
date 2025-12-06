@@ -1,8 +1,10 @@
+/* global Moyasar */
+
 import React, { useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   getUserById,
-  getBankDetails,
+  
   removeFromCart,
   updateUser,
   updateCartItem,
@@ -11,17 +13,14 @@ import {
   createOrderWithProof,
 } from "../../api/api";
 import BottomNav from "../../components/BottomNav";
-import jsQR from "jsqr";
+
 import { useNavigate } from "react-router-dom";
-import { Copy } from "lucide-react";
 const API_BASE = process.env.REACT_APP_API_BASE; // ✅ من env
 const Checkout = () => {
   const userId = JSON.parse(localStorage.getItem("user"))?._id;
   const [user, setUser] = useState(null);
-  const [banks, setBanks] = useState([]);
   const [cart, setCart] = useState([]);
-  const [receipt, setReceipt] = useState(null);
-  const [isEditing, setIsEditing] = useState(false);
+    const [isEditing, setIsEditing] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const plusIcon = "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968591/plus_xwrg7i.svg";
   const minusIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968578/minus_rpgpcr.svg";
@@ -39,6 +38,12 @@ const Checkout = () => {
   const [copiedField, setCopiedField] = useState(null);
   const [alertMessage, setAlertMessage] = useState("");
   const navigate = useNavigate();
+const totalProducts = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+const delivery = 20;
+const total = totalProducts + delivery;
+
+   const PUBLIC_KEY = "pk_test_Q7YDAzTTP2WUQqyLGdHD9vSms6596uWUziq1Xu1x"; // ضعي المفتاح هنا
+
   // ✅ دالة لتحديد رابط الصورة الصحيح سواء من Cloudinary أو من السيرفر
   const getImageUrl = (path) => {
     if (!path) return "";
@@ -48,7 +53,7 @@ const Checkout = () => {
   useEffect(() => {
     if (userId) {
       loadUser();
-      loadBanks();
+      
     }
   }, [userId]);
   const loadUser = async () => {
@@ -63,15 +68,7 @@ const Checkout = () => {
       address: res.data.address || "",
     });
   };
-  const loadBanks = async () => {
-    const res = await getBankDetails();
-    const banksWithFullUrls = res.data.map((b) => ({
-      ...b,
-      barcode: getImageUrl(b.barcode),
-    }));
-    setBanks(banksWithFullUrls);
-  };
-  const handleRemoveItem = async (itemId) => {
+    const handleRemoveItem = async (itemId) => {
     // ✅ تحديث محلي سلس: إزالة العنصر فورًا
     const updatedCart = cart.filter((item) => item._id !== itemId);
     setCart(updatedCart);
@@ -135,6 +132,8 @@ const Checkout = () => {
     await loadUser();
     setIsEditing(false);
   };
+
+
   const updateQuantity = async (itemId, newQty) => {
     if (newQty <= 0) {
       await handleRemoveItem(itemId);
@@ -169,89 +168,53 @@ const Checkout = () => {
       setTimeout(() => setAlertMessage(""), 2500);
     }
   };
-  const copyToClipboard = (text, field) => {
-    navigator.clipboard.writeText(text);
-    setCopiedField(field);
-    setTimeout(() => setCopiedField(null), 2000);
-  };
-  const handleScanBarcode = () => {
-    if (!banks[0]?.barcode) return alert(" لا يوجد باركود متاح");
-    const img = new Image();
-    img.src = getImageUrl(banks[0].barcode);
-    img.crossOrigin = "anonymous";
-    img.onload = () => {
-      const canvas = document.createElement("canvas");
-      canvas.width = img.width;
-      canvas.height = img.height;
-      const ctx = canvas.getContext("2d");
-      ctx.drawImage(img, 0, 0);
-      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-      const code = jsQR(imageData.data, imageData.width, imageData.height);
-      if (code) {
-        const qrValue = code.data.trim();
-        console.log("📦 رمز الباركود:", qrValue);
-        // 🟢 إذا كان الرابط يبدأ بـ http نعرضه كزر قابل للفتح
-        if (qrValue.startsWith("http")) {
-          const open = window.confirm(
-            ` تم قراءة الباركود:\n${qrValue}\n\nهل ترغب بفتح الرابط الآن؟`
-          );
-          if (open) window.open(qrValue, "_blank");
-        } else {
-          // 🔸 في حال كان نص وليس رابط
-          alert(`📦 رمز الباركود: ${qrValue}`);
-        }
+
+
+const handlePay = () => {
+  Moyasar.init({
+    element: ".moyasar-form",
+    amount: total * 100, // بالهللة
+    currency: "SAR",
+    description: `طلب جديد من ${user.firstName}`,
+    publishable_api_key: PUBLIC_KEY,
+    methods: ["creditcard"],
+
+    on_completed: async (payment) => {
+      console.log("Payment Completed:", payment);
+
+      if (payment.status === "paid") {
+        await createOrder({
+          user: userId,
+          items: cart.map((item) => ({
+            product: item.product._id || item.product,
+            name: item.name,
+            price: item.price,
+            mainImage: item.mainImage,
+            quantity: item.quantity,
+          })),
+          shipping: {
+            name: `${user.firstName} ${user.lastName}`,
+            phone: user.phone,
+            address: user.address || "",
+            coords: [user.longitude, user.latitude],
+          },
+          subtotal: totalProducts,
+          tax: 0,
+          delivery,
+          total,
+          paymentId: payment.id,
+        });
+
+        alert("تم الدفع وإنشاء الطلب بنجاح 🎉");
+
+        navigate("/my-orders");
       } else {
-        alert(" تعذر قراءة الباركود");
+        alert("عملية الدفع لم تنجح. حاول مرة أخرى.");
       }
-    };
-    img.onerror = () => {
-      alert(" تعذر تحميل صورة الباركود");
-    };
-  };
-  const totalProducts = cart.reduce(
-    (sum, item) => sum + item.price * item.quantity,
-    0
-  );
-  const delivery = 20;
-  const total = totalProducts + delivery;
-  const handleSubmit = async () => {
-    if (!receipt) return alert("📎 يرجى إرفاق إيصال الدفع أولاً");
-    setSubmitting(true); // 🔵 تشغيل التحميل
-    const orderData = {
-      user: userId,
-      items: cart.map((item) => ({
-        product: item.product._id || item.product,
-        name: item.name,
-        price: item.price,
-        mainImage: item.mainImage,
-        quantity: item.quantity,
-      })),
-      shipping: {
-        name: `${user.firstName} ${user.lastName}`,
-        phone: user.phone,
-        address: user.address || "",
-        coords: [user.longitude, user.latitude],
-      },
-      subtotal: totalProducts,
-      tax: 0,
-      delivery,
-      total,
-    };
-    try {
-      const formData = new FormData();
-      formData.append("file", receipt);
-      formData.append("orderData", JSON.stringify(orderData));
-      const res = await createOrderWithProof(formData);
-      window.dispatchEvent(new Event("cartUpdated"));
-      alert(" تم إرسال الطلب بنجاح");
-      navigate("/my-orders");
-    } catch (err) {
-      console.error(" Error:", err.response?.data || err.message);
-      alert("حدث خطأ أثناء إنشاء الطلب. حاول مرة أخرى.");
-    } finally {
-      setSubmitting(false); // 🔵 إيقاف التحميل
     }
-  };
+  });
+};
+
   return (
     <>
       <div style={styles.page}>
@@ -363,51 +326,7 @@ const Checkout = () => {
               )}
             </div>
           )}
-          {/* 🏦 بيانات الدفع */}
-          <h2 style={styles.header}>بيانات الدفع</h2>
-          {banks.length > 0 && (
-            <div style={styles.box}>
-              <img
-                src={getImageUrl(banks[0].barcode)}
-                alt="barcode"
-                style={{
-                  width: "120px",
-                  borderRadius: "30px",
-                  cursor: "pointer",
-                }}
-                onClick={handleScanBarcode}
-              />
-              <p>
-                <b>الاسم:</b> {banks[0].ownerName}
-              </p>
-              <p style={styles.copyRow}>
-                <b>رقم الآيبان:</b> {banks[0].iban}
-               <Copy
-  size={18}
-  style={styles.copyIcon}
-  onClick={() => copyToClipboard(banks[0].iban, "iban")}
-/>
-                {copiedField === "iban" && (
-                  <span style={styles.copiedText}>تم النسخ ✓</span>
-                )}
-              </p>
-              <p style={styles.copyRow}>
-                <b>رقم الحساب:</b> {banks[0].accountNumber}
-               <Copy
-  size={18}
-  style={styles.copyIcon}
-  onClick={() => copyToClipboard(banks[0].accountNumber, "account")}
-/>
-                {copiedField === "account" && (
-                  <span style={styles.copiedText}>تم النسخ ✓</span>
-                )}
-              </p>
-              <p>
-                <b>اسم البنك:</b> {banks[0].bankName}
-              </p>
-            </div>
-          )}
-          {/* 🛍️ المنتجات */}
+                   {/* 🛍️ المنتجات */}
           <h2 style={styles.header}>المنتجات</h2>
           <div style={styles.box}>
             {cart.length > 0 ? (
@@ -461,30 +380,18 @@ const Checkout = () => {
             <p>سعر التوصيل: {delivery} ر.س</p>
             <hr />
             <h3>الإجمالي: {total} ر.س</h3>
-            <label style={styles.uploadLabel}>
-               إرفاق إيصال الدفع (PDF)
-              <input
-                type="file"
-                accept="application/pdf"
-                onChange={(e) => setReceipt(e.target.files[0])}
-                style={{ display: "none" }}
-              />
-            </label>
-            {receipt && <p style={styles.fileName}>الملف: {receipt.name}</p>}
-            <button
-  style={{
-    ...styles.confirmBtn,
-    opacity: receipt ? 1 : 0.6,
-    pointerEvents: receipt ? "auto" : "none",
-  }}
-  onClick={handleSubmit}
-  disabled={submitting}
+           <button
+  style={styles.confirmBtn}
+  onClick={handlePay}
 >
-  {submitting ? " جاري إرسال الطلب..." : " تأكيد الدفع"}
+  ادفع الآن
 </button>
+
           </div>
         </motion.div>
       </div>
+<div className="moyasar-form"></div>
+
       <BottomNav />
       {/* 🔔 Toast */}
       <AnimatePresence>
