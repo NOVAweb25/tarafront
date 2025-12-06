@@ -42,7 +42,7 @@ const totalProducts = cart.reduce((sum, item) => sum + item.price * item.quantit
 const delivery = 20;
 const total = totalProducts + delivery;
 
-   const PUBLIC_KEY = "pk_test_Q7YDAzTTP2WUQqyLGdHD9vSms6596uWUziq1Xu1x"; // ضعي المفتاح هنا
+   const PUBLIC_KEY = "pk_live_h6SGKCKKZwFHQSUADAcA2PXFuXy71mFXdHFRdLM5"; // ضعي المفتاح هنا
 
   // ✅ دالة لتحديد رابط الصورة الصحيح سواء من Cloudinary أو من السيرفر
   const getImageUrl = (path) => {
@@ -171,47 +171,58 @@ const total = totalProducts + delivery;
 
 
 const handlePay = () => {
-  Moyasar.init({
+  if (!window.Moyasar) {
+    alert("خطأ: مكتبة الدفع لم يتم تحميلها.");
+    return;
+  }
+
+  window.Moyasar.init({
     element: ".moyasar-form",
-    amount: total * 100, // بالهللة
+    amount: total * 100, // هللة
     currency: "SAR",
     description: `طلب جديد من ${user.firstName}`,
     publishable_api_key: PUBLIC_KEY,
     methods: ["creditcard"],
 
     on_completed: async (payment) => {
-      console.log("Payment Completed:", payment);
+      console.log("🔔 Result from Moyasar:", payment);
 
-      if (payment.status === "paid") {
-        await createOrder({
-          user: userId,
-          items: cart.map((item) => ({
-            product: item.product._id || item.product,
-            name: item.name,
-            price: item.price,
-            mainImage: item.mainImage,
-            quantity: item.quantity,
-          })),
-          shipping: {
-            name: `${user.firstName} ${user.lastName}`,
-            phone: user.phone,
-            address: user.address || "",
-            coords: [user.longitude, user.latitude],
-          },
-          subtotal: totalProducts,
-          tax: 0,
-          delivery,
-          total,
-          paymentId: payment.id,
-        });
+      const paymentStatus = payment.status === "paid" ? "paid" : "failed";
 
-        alert("تم الدفع وإنشاء الطلب بنجاح 🎉");
+      if (paymentStatus === "paid") {
+        try {
+          await createOrder({
+            user: userId,
+            items: cart.map((item) => ({
+              product: item.product._id || item.product,
+              name: item.name,
+              price: item.price,
+              mainImage: item.mainImage,
+              quantity: item.quantity,
+            })),
+            shipping: {
+              name: `${user.firstName} ${user.lastName}`,
+              phone: user.phone,
+              address: user.address || "",
+              coords: [user.longitude, user.latitude],
+            },
+            subtotal: totalProducts,
+            delivery,
+            total,
+            paymentId: payment.id,
+            paymentStatus: paymentStatus, // 👈 المهم هنا
+          });
 
-        navigate("/my-orders");
+          alert("تم الدفع بنجاح وإنشاء الطلب ");
+          navigate("/my-orders");
+        } catch (err) {
+          console.error("Create Order Error: ", err);
+          alert("حدث خطأ أثناء إنشاء الطلب، الرجاء التواصل مع الدعم.");
+        }
       } else {
-        alert("عملية الدفع لم تنجح. حاول مرة أخرى.");
+        alert("فشل الدفع! لم يتم إنشاء الطلب ");
       }
-    }
+    },
   });
 };
 
