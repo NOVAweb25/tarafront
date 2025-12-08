@@ -4,6 +4,9 @@ import { getMyOrders, addToCart, addFavorite } from "../../api/api";
 import { Share2 } from "lucide-react";
 import BottomNav from "../../components/BottomNav";
 import { getUserById } from "../../api/api";
+import NotificationPopup from "../../components/NotificationPopup";
+import { requestNotificationPermission } from "../../firebase";
+
 import "./MyOrders.css";
 const API_BASE = process.env.REACT_APP_API_BASE; // ✅ من env
 const MyOrders = () => {
@@ -17,6 +20,8 @@ const MyOrders = () => {
   const [alertMessage, setAlertMessage] = useState("");
   const [userFavorites, setUserFavorites] = useState([]);
   const [userCart, setUserCart] = useState([]);
+  const [showPopup, setShowPopup] = useState(false);
+
 const invoiceIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968572/invoice_kkbd8p.svg";
 const closeIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968567/close_mcygjs.svg";
   const statuses = [
@@ -35,12 +40,6 @@ const closeIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968567/
   };
  const SearchIcon = "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968618/search_ke1zur.svg";
 const cartIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968566/cart_jsj3mh.svg";
-  useEffect(() => {
-    const delayDebounce = setTimeout(() => {
-      if (user?._id) loadOrders();
-    }, 300);
-    return () => clearTimeout(delayDebounce);
-  }, [user, statusFilter, search]);
   const loadOrders = async () => {
     try {
       const res = await getMyOrders(user._id);
@@ -64,6 +63,7 @@ const cartIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968566/c
       console.error("Error fetching orders:", err);
     }
   };
+
   useEffect(() => {
     if (!user?._id) return;
     const fetchUserData = async () => {
@@ -82,6 +82,30 @@ const cartIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968566/c
     };
     fetchUserData();
   }, [user]);
+
+useEffect(() => {
+    if (!user) return;
+
+    // إذا العميل ما عطى الإذن سابقًا
+    if (Notification.permission === "default") {
+      setShowPopup(true);
+    }
+  }, []);
+
+  
+  useEffect(() => {
+    const delayDebounce = setTimeout(() => {
+      if (user?._id) loadOrders();
+    }, 300);
+    return () => clearTimeout(delayDebounce);
+  }, [user, statusFilter, search]);
+
+const allowNotifications = async () => {
+    await requestNotificationPermission(user._id);
+    setShowPopup(false);
+    alert("✨ تم تفعيل الإشعارات!");
+  };
+
   const handleAddToCart = async (product) => {
     if (!user?._id) return;
     const currentItem = userCart.find((i) => (i.product?._id || i.product) === product._id);
@@ -163,8 +187,20 @@ const cartIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968566/c
     const url = getImageUrl(proofUrl);
     window.open(url, "_blank");
   };
+
+
+  
+
+  
   return (
     <>
+{showPopup && (
+        <NotificationPopup
+          message="هل تريد تفعيل الإشعارات لتتبع حالة طلباتك؟"
+          onAllow={allowNotifications}
+          onClose={() => setShowPopup(false)}
+        />
+      )}
       <div className="myorders-page">
         {/* 🔍 شريط البحث والفلاتر */}
         <div className="search-wrapper">

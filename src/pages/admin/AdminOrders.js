@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-
+import NotificationPopup from "../../components/NotificationPopup";
+import { requestNotificationPermission } from "../../firebase";
 import { Share2 } from "lucide-react";
 import { getOrders, getOrderById, updateOrder } from "../../api/api";
 import "./AdminOrders.css";
@@ -17,7 +18,10 @@ const AdminOrders = () => {
   const [selectedInvoice, setSelectedInvoice] = useState(null);
   const [invoiceData, setInvoiceData] = useState(null);
   const [activeStatusMenu, setActiveStatusMenu] = useState(null);
+  const [showPopup, setShowPopup] = useState(false);
   const filterRef = useRef(null);
+   const user = JSON.parse(localStorage.getItem("user"));
+
 const SearchIcon = "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968618/search_ke1zur.svg";
 
 const invoiceIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968572/invoice_kkbd8p.svg";
@@ -40,6 +44,13 @@ const invoiceIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v176396857
       console.error("فشل تحميل الطلبات:", err);
     }
   };
+useEffect(() => {
+    if (user?.role === "admin") {
+      if (Notification.permission === "default") {
+        setShowPopup(true);
+      }
+    }
+  }, []);
 useEffect(() => {
   // 🔹 عند فتح صفحة الطلبات، نعتبر التنبيهات مقروءة
   window.dispatchEvent(new Event("ordersViewed"));
@@ -139,11 +150,26 @@ useEffect(() => {
 
   };
 
+
+ const allowNotifications = async () => {
+    await requestNotificationPermission(user._id);
+    setShowPopup(false);
+    alert(" سيتم تنبيهك عند وصول طلب جديد");
+  };
+
+
 console.log("🔍 API_BASE =", API_BASE);
 
 
   return (
     <div className="admin-page">
+  {showPopup && (
+        <NotificationPopup
+          message="هل تريد تفعيل الإشعارات لتنبيهك عند وصول طلب جديد؟"
+          onAllow={allowNotifications}
+          onClose={() => setShowPopup(false)}
+        />
+      )}
       <AdminSidebar />
       <div className="admin-content">
         <h2 className="page-title">إدارة الطلبات</h2>

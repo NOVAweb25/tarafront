@@ -22,6 +22,8 @@ import ProductDetails from "./pages/client/ProductDetails";
 import MyOrders from "./pages/client/MyOrders";
 import { requestNotificationPermission, listenToMessages } from "./firebase";
 import Review from "./pages/client/Review";
+import PaymentSuccess from "./pages/client/PaymentSuccess";
+import PaymentFailed from "./pages/client/PaymentFailed";
 
 
 
@@ -198,6 +200,9 @@ useEffect(() => {
           </AdminRoute>
         }
       />
+<Route path="/payment-success" element={<PaymentSuccess />} />
+<Route path="/payment-failed" element={<PaymentFailed />} />
+
 <Route
   path="/admin/profile"
   element={

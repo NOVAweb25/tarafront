@@ -1,0 +1,40 @@
+.notif-popup {
+  position: fixed;
+  bottom: 25px;
+  right: 25px;
+  background: rgba(0,0,0,0.35);
+  backdrop-filter: blur(4px);
+  width: 100%;
+  max-width: 280px;
+  padding: 0;
+  z-index: 9999;
+}
+
+.notif-box {
+  background: white;
+  padding: 14px;
+  border-radius: 12px;
+  box-shadow: 0 6px 25px rgba(0,0,0,0.10);
+  text-align: center;
+}
+
+.notif-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 14px;
+}
+
+.allow-btn {
+  background: #D15C1D;
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 8px;
+}
+
+.cancel-btn {
+  background: #ccc;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 8px;
+}

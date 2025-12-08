@@ -1,8 +1,10 @@
-//src/firebase.js
+// src/firebase.js
 
 import { initializeApp } from "firebase/app";
 import { onMessage } from "firebase/messaging";
 import { getMessaging, getToken } from "firebase/messaging";
+import { API_BASE, VAPID_KEY } from "./firebaseConfig"; 
+// ⬆ سننشئ هذا الملف الآن
 
 const firebaseConfig = {
   apiKey: "AIzaSyB6lOJS5aY5wOkjYlib9bl5YAMu9jLsM-g",
@@ -16,16 +18,15 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 export const messaging = getMessaging(app);
 
-// 🟢 دالة لطلب صلاحية الإشعارات وحفظ الـtoken في الباك إند
+// 🟢 طلب صلاحيات الإشعارات وتسجيل التوكن
 export const requestNotificationPermission = async (userId) => {
   try {
-    const vapidKey = process.env.REACT_APP_VAPID_KEY;
-    const token = await getToken(messaging, { vapidKey });
+    const token = await getToken(messaging, { vapidKey: VAPID_KEY });
 
     if (token) {
       console.log("🔑 fcmToken:", token);
-     await fetch(`${process.env.REACT_APP_API_BASE}/users/${userId}/fcm-token`, {
 
+      await fetch(`${API_BASE}/users/${userId}/fcm-token`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ fcmToken: token }),
@@ -45,16 +46,14 @@ export const listenToMessages = (onNotification) => {
     const title = payload?.notification?.title || "إشعار جديد";
     const body = payload?.notification?.body || "";
 
-    // 🔹 تمرير الإشعار إلى React (داخل الموقع)
     if (onNotification) {
       onNotification({ title, body });
     }
 
-    // 🔹 إشعار النظام (خارج الموقع)
     if (Notification.permission === "granted") {
       new Notification(title, {
         body,
-        icon: "/logo192.png", // يمكنك وضع شعار موقعك هنا
+        icon: "/logo192.png",
         vibrate: [100, 50, 100],
         tag: "order-update",
       });

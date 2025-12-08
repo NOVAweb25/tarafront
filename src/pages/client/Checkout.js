@@ -184,6 +184,10 @@ const handlePay = () => {
     publishable_api_key: PUBLIC_KEY,
     methods: ["creditcard"],
 
+callback_url: "https://poiseback.onrender.com/api/payment/callback",
+  success_url: "https://tarafront.vercel.app/payment-success",
+  failure_url: "https://tarafront.vercel.app/payment-failed",
+
     on_completed: async (payment) => {
       console.log("🔔 Result from Moyasar:", payment);
 
