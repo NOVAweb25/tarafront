@@ -21,7 +21,14 @@ export const messaging = getMessaging(app);
 // 🟢 طلب صلاحيات الإشعارات وتسجيل التوكن
 export const requestNotificationPermission = async (userId) => {
   try {
-    const token = await getToken(messaging, { vapidKey: VAPID_KEY });
+    let token = null;
+try {
+  token = await getToken(messaging, { vapidKey: VAPID_KEY });
+} catch (err) {
+  console.warn("FCM Token Error:", err);
+  return; // يمنع الكراش
+}
+
 
     if (token) {
       console.log("🔑 fcmToken:", token);

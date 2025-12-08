@@ -84,13 +84,16 @@ const cartIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968566/c
   }, [user]);
 
 useEffect(() => {
-    if (!user) return;
+  if (!user) return;
 
-    // إذا العميل ما عطى الإذن سابقًا
-    if (Notification.permission === "default") {
+  try {
+    if ("Notification" in window && Notification.permission === "default") {
       setShowPopup(true);
     }
-  }, []);
+  } catch (e) {
+    console.warn("Notifications not supported:", e);
+  }
+}, []);
 
   
   useEffect(() => {

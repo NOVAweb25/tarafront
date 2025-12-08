@@ -44,13 +44,21 @@ const invoiceIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v176396857
       console.error("فشل تحميل الطلبات:", err);
     }
   };
+
 useEffect(() => {
-    if (user?.role === "admin") {
-      if (Notification.permission === "default") {
-        setShowPopup(true);
-      }
+  if (user?.role !== "admin") return;
+
+  try {
+    if ("Notification" in window && Notification.permission === "default") {
+      setShowPopup(true);
     }
-  }, []);
+  } catch (e) {
+    console.warn("Notifications not supported:", e);
+  }
+}, []);
+
+
+
 useEffect(() => {
   // 🔹 عند فتح صفحة الطلبات، نعتبر التنبيهات مقروءة
   window.dispatchEvent(new Event("ordersViewed"));
