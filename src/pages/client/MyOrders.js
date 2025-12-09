@@ -5,7 +5,7 @@ import { Share2 } from "lucide-react";
 import BottomNav from "../../components/BottomNav";
 import { getUserById } from "../../api/api";
 import NotificationPopup from "../../components/NotificationPopup";
-import { requestNotificationPermission } from "../../firebase";
+import { requestNotificationPermission, listenToMessages } from "../../firebase";
 
 import "./MyOrders.css";
 const API_BASE = process.env.REACT_APP_API_BASE; // ✅ من env
@@ -85,16 +85,23 @@ const cartIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968566/c
 
 useEffect(() => {
   if (!user) return;
-
-  try {
-    if ("Notification" in window && Notification.permission === "default") {
+  console.log("📍 Notification.permission:", Notification.permission);
+  if ("Notification" in window) {
+    if (Notification.permission === "default") {
       setShowPopup(true);
+    } else if (Notification.permission === "granted") {
+      requestNotificationPermission(user._id); // أعد الحصول على token
+    } else {
+      console.warn("⚠️ Notifications denied by user");
     }
-  } catch (e) {
-    console.warn("Notifications not supported:", e);
   }
-}, []);
-
+  // 🟢 استمع للإشعارات في الواجهة (foreground)
+  listenToMessages((notification) => {
+    setAlertMessage(`${notification.title}: ${notification.body}`); // أو toast
+    setShowAlert(true);
+    setTimeout(() => setShowAlert(false), 3000);
+  });
+}, [user]);
   
   useEffect(() => {
     const delayDebounce = setTimeout(() => {

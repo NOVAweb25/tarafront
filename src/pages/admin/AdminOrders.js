@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import NotificationPopup from "../../components/NotificationPopup";
-import { requestNotificationPermission } from "../../firebase";
+import { requestNotificationPermission, listenToMessages } from "../../firebase";
 import { Share2 } from "lucide-react";
 import { getOrders, getOrderById, updateOrder } from "../../api/api";
 import "./AdminOrders.css";
@@ -47,15 +47,22 @@ const invoiceIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v176396857
 
 useEffect(() => {
   if (user?.role !== "admin") return;
-
-  try {
-    if ("Notification" in window && Notification.permission === "default") {
+  console.log("📍 Notification.permission (Admin):", Notification.permission);
+  if ("Notification" in window) {
+    if (Notification.permission === "default") {
       setShowPopup(true);
+    } else if (Notification.permission === "granted") {
+      requestNotificationPermission(user._id);
+    } else {
+      console.warn("⚠️ Notifications denied by user");
     }
-  } catch (e) {
-    console.warn("Notifications not supported:", e);
   }
-}, []);
+  // 🟢 استمع للإشعارات
+  listenToMessages((notification) => {
+    loadOrders(); // أعد تحميل الطلبات
+    alert(`${notification.title}: ${notification.body}`);
+  });
+}, [user]);
 
 
 

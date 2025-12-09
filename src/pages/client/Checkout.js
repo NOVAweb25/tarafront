@@ -42,7 +42,7 @@ const totalProducts = cart.reduce((sum, item) => sum + item.price * item.quantit
 const delivery = 20;
 const total = totalProducts + delivery;
 
-   const PUBLIC_KEY = "pk_live_h6SGKCKKZwFHQSUADAcA2PXFuXy71mFXdHFRdLM5"; // ضعي المفتاح هنا
+   const PUBLIC_KEY = "pk_test_Q7YDAzTTP2WUQqyLGdHD9vSms6596uWUziq1Xu1x"; // ضعي المفتاح هنا
 
   // ✅ دالة لتحديد رابط الصورة الصحيح سواء من Cloudinary أو من السيرفر
   const getImageUrl = (path) => {
