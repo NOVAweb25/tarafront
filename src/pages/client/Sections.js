@@ -53,6 +53,7 @@ const Sections = () => {
   // 🔹 تحميل الأقسام
   useEffect(() => {
     (async () => {
+      setLoading(true); // بدء التحميل للأقسام
       try {
         const res = await getSections();
         const data = res.data.map((s) => ({
@@ -64,6 +65,8 @@ const Sections = () => {
         setSections(data);
       } catch (err) {
         console.error(err);
+      } finally {
+        setLoading(false); // انتهاء التحميل
       }
     })();
   }, []);
@@ -83,6 +86,7 @@ const Sections = () => {
   useEffect(() => {
     if (!selectedSection) return;
     (async () => {
+      setLoading(true); // بدء التحميل للتصنيفات
       try {
         const res = await getCategories();
         const filtered = res.data.filter(
@@ -91,12 +95,15 @@ const Sections = () => {
         setCategories(filtered);
       } catch (e) {
         console.error(e);
+      } finally {
+        setLoading(false); // انتهاء التحميل
       }
     })();
   }, [selectedSection]);
   useEffect(() => {
     const fetchProducts = async () => {
       if (!selectedSection) return;
+      setLoading(true); // بدء التحميل للمنتجات
       try {
         const res = await getProducts({ sectionId: normalizeId(selectedSection._id) });
         const data = res.data
@@ -109,6 +116,8 @@ const Sections = () => {
         setProducts(data);
       } catch (err) {
         console.error("Error loading section products:", err);
+      } finally {
+        setLoading(false); // انتهاء التحميل
       }
     };
     fetchProducts();
@@ -192,8 +201,8 @@ const Sections = () => {
   useEffect(() => {
     const fetchAllProducts = async () => {
       if (selectedSection) return; // ❗ مهم: إذا فيه قسم محدد لا تجيب الكل
+      setLoading(true);
       try {
-        setLoading(true);
         const res = await getProducts({});
         const data = res.data.map((p) => ({
           ...p,
@@ -246,7 +255,7 @@ const Sections = () => {
     let stock = 0;
     try {
       const productRes = await getProductById(product._id);
-      stock = productRes.data.stock ?? 0;
+      stock = productRes.data.stock ?? 0; // ✅ ضمن وجود stock في الـ products state
     } catch (err) {
       console.error("❌ Error fetching product stock:", err);
       setAlertMessage("حدث خطأ أثناء التحقق من المخزون 😔");
@@ -393,6 +402,7 @@ const Sections = () => {
           ))}
         </motion.div>
       )}
+      {loading && <div className="loading-bar"></div>}
       {loading && <p className="loading-text">جاري تحميل المنتجات...</p>}
       {/* 🛍️ المنتجات */}
       {products.length > 0 && (

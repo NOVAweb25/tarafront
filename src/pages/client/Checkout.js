@@ -30,7 +30,7 @@ const Checkout = () => {
     phone: "",
     location: "",
     latitude: null,
-    longitude: "",
+    longitude: null,
     address: "",
     city: "",
     neighborhood: "",
@@ -68,19 +68,34 @@ const Checkout = () => {
   }, [userId]);
   const loadUser = async () => {
     const res = await getUserById(userId);
-    setUser(res.data);
-    setCart(res.data.cart || []);
+    const data = res.data;
+    setUser(data);
+    setCart(data.cart || []);
     setEditData({
-      firstName: res.data.firstName || "",
-      lastName: res.data.lastName || "",
-      phone: res.data.phone || "",
-      location: res.data.location || "",
-      address: res.data.address || "",
-      city: res.data.city || "",
-      neighborhood: res.data.neighborhood || "",
-      street: res.data.street || "",
-      nearestLandmark: res.data.nearestLandmark || "",
+      firstName: data.firstName || "",
+      lastName: data.lastName || "",
+      phone: data.phone || "",
+      location: data.location || "",
+      address: data.address || "",
+      city: data.city || "",
+      neighborhood: data.neighborhood || "",
+      street: data.street || "",
+      nearestLandmark: data.nearestLandmark || "",
+      latitude: data.latitude || null,
+      longitude: data.longitude || null,
     });
+    // تحقق إذا كانت البيانات ناقصة، فعرض وضع التحرير تلقائياً
+    if (
+      !data.firstName ||
+      !data.lastName ||
+      !data.phone ||
+      !data.city ||
+      !data.neighborhood ||
+      !data.street ||
+      !data.nearestLandmark
+    ) {
+      setIsEditing(true);
+    }
   };
   const handleRemoveItem = async (itemId) => {
     const updatedCart = cart.filter((item) => item._id !== itemId);
@@ -174,6 +189,12 @@ const Checkout = () => {
     }
   };
   const handlePay = () => {
+    if (!user.city || !user.neighborhood || !user.street || !user.nearestLandmark) {
+      setAlertMessage("يرجى ملء جميع تفاصيل العنوان قبل الدفع.");
+      setIsEditing(true); // عرض خانات التعديل تلقائياً
+      setTimeout(() => setAlertMessage(""), 3000);
+      return;
+    }
     if (!window.Moyasar) {
       setAlertMessage("خطأ: مكتبة Moyasar لم يتم تحميلها. جرب إعادة تحميل الصفحة.");
       setTimeout(() => setAlertMessage(""), 3000);

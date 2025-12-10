@@ -35,7 +35,6 @@ const getImageUrl = (url) => {
   if (url.startsWith("http")) return url; // رابط Cloudinary
   return `${API_BASE}${url}`; // رابط من السيرفر
 };
- 
   // 🟢 جلب بيانات المستخدم الحالي
   const fetchCurrentUser = async () => {
     try {
@@ -375,7 +374,11 @@ const CartSheet = ({ cart, loading, total, screenHeight, setActiveModal, updateQ
         <h3 style={styles.title}>سلتي ({cart.length})</h3>
         <div style={{ ...styles.scroll, paddingBottom }}>
           {loading ? (
-            <p style={styles.emptyText}>جاري التحميل...</p>
+            <motion.div
+              style={styles.loadingBar}
+              animate={{ x: ["100%", "-100%"] }}
+              transition={{ repeat: Infinity, duration: 1.5, ease: "linear" }}
+            />
           ) : cart.length === 0 ? (
             <p style={styles.emptyText}>السلة فارغة</p>
           ) : (
@@ -505,7 +508,11 @@ const FavSheet = ({ favorites, loading, screenHeight, setActiveModal, handleAddT
         <h3 style={styles.title}>مفضلتي ({favorites.length})</h3>
         <div style={{ ...styles.scroll, paddingBottom }}>
           {loading ? (
-            <p style={styles.emptyText}>جاري التحميل...</p>
+            <motion.div
+              style={styles.loadingBar}
+              animate={{ x: ["100%", "-100%"] }}
+              transition={{ repeat: Infinity, duration: 1.5, ease: "linear" }}
+            />
           ) : favorites.length === 0 ? (
             <p style={styles.emptyText}>لا توجد منتجات مفضلة</p>
           ) : (
@@ -551,182 +558,4 @@ const FavSheet = ({ favorites, loading, screenHeight, setActiveModal, handleAddT
   );
 };
 export default BottomNav;
-const styles = {
-  badge: {
-    position: "absolute",
-    top: "-6px",
-    right: "-6px",
-    background: "#a0bebf",
-    color: "#a0bebf",
-    fontSize: "10px",
-    fontWeight: "bold",
-    width: "18px",
-    height: "18px",
-    borderRadius: "50%",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  navbar: (mode) => ({
-  position: "fixed",
-  zIndex: 1000,
-  background: "rgba(160, 190, 191, 0.55)", // نفس اللون A0BEBF لكن شفاف
-backdropFilter: "blur(10px)",
-WebkitBackdropFilter: "blur(10px)", // للجوال
-border: "1px solid rgba(255,255,255,0.25)",
-boxShadow: "0 8px 25px rgba(0,0,0,0.15)",
-  borderRadius: "30px",
-  display: "flex",
-  gap: "15px",
-  ...(mode === "vertical"
-    ? {
-        // 🔵 وضع عامودي كامل
-        top: "50%",
-        left: "20px",
-        transform: "translateY(-50%)",
-        flexDirection: "column",
-        width: "70px",
-        height: "auto",
-        padding: "15px 0",
-      }
-    : {
-        // 🟡 الوضع الأفقي الأساسي
-        bottom: "70px",
-        left: "50%",
-        transform: "translateX(-50%)",
-        flexDirection: "row",
-        justifyContent: "space-around",
-        alignItems: "center",
-        width: "90vw",
-        maxWidth: "420px",
-        height: "65px",
-      }),
-}),
-  iconBtn: { background: "transparent", border: "none", cursor: "pointer", position: "relative" },
-  icon: { width: "35px", height: "35px" },
-  bigFavIcon: { width: "30px", height: "30px" },
-  overlay: {
-    position: "fixed",
-    inset: 0,
-    background: "rgba(0,0,0,0.45)",
-    zIndex: 1200,
-  },
-sheet: {
-  position: "fixed",
-  bottom: 0,
-  left: 0,
-  width: "100vw", // ⬅️ يملأ عرض الجوال كامل
-  background: "#a0bebf",
-  borderTopLeftRadius: "30px",
-  borderTopRightRadius: "30px",
-  boxShadow: "0 -4px 15px rgba(0,0,0,0.25)",
-  padding: "5px",
-  zIndex: 1300,
-  height: "60vh", // ⬅️ ياخذ 85% من ارتفاع الشاشة (خلاص ما يختفي)
-  maxHeight: "85vh", // ⬅️ يمنع القصّ في جوالات صغيرة
-  overflow: "hidden",
-  display: "flex",
-  flexDirection: "column",
-},
-scroll: {
-  flex: 1,
-  overflowY: "auto",
-  overflowX: "hidden",
-  paddingRight: "6px",
-  WebkitOverflowScrolling: "touch",
-},
-  toast: {
-    position: "fixed",
-    bottom: "90px",
-    left: "50%",
-    transform: "translateX(-50%)",
-    background: "#d15c1d",
-    color: "#f1ebcc",
-    padding: "10px 20px",
-    borderRadius: "30px",
-    fontSize: "14px",
-    fontWeight: "600",
-    boxShadow: "0 4px 10px rgba(0,0,0,0.2)",
-    zIndex: 2000,
-  },
-title: {
-  fontSize: "1.2rem",
-  fontWeight: "700",
-  marginBottom: "12px",
-  textAlign: "center",
-  color: "#f1ebcc", // ← اللون الجديد
-},
-  emptyText: { textAlign: "center", color: "#f1ebcc ", marginTop: "20px" },
-card: {
-  display: "flex",
-  alignItems: "center",
-  gap: "10px",
-  background: "#f1ebcc",
-  borderRadius: "20px",
-  padding: "10px",
-  boxShadow: "0 2px 6px rgba(0,0,0,0.08)",
-},
-name: { fontSize: "0.9rem", fontWeight: "600", color: "#493c33" },
-price: { fontSize: "0.8rem", fontWeight: "500", color: "#493c33" },
-image: {
-  width: "60px",
-  height: "60px",
-  borderRadius: "18px",
-  objectFit: "cover",
-  border: "1px solid #f2a72d",
-},
-details: {
-  flex: 1,
-  display: "flex",
-  flexDirection: "column",
-  gap: "5px",
-},
-qtyBtn: {
-  backgroundColor: "#fff",
-  borderRadius: "50%",
-  width: "28px",
-  height: "28px",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-  border: "none",
-  padding: "0",
-  cursor: "pointer",
-},
-  deleteIcon: { width: "28px", height: "28px", cursor: "pointer" },
-smallIcon: { width: "22px", height: "22px", cursor: "pointer" },
-  favActions: { display: "flex", gap: "22px", alignItems: "center" },
-  footer: {
-    marginTop: "10px",
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    borderTop: "1px solid #f2a72d",
-    paddingTop: "10px",
-  },
-  total: { fontSize: "1rem",color: "#f1ebcc", fontWeight: "600" },
-  checkoutBtn: {
-    background: "linear-gradient(90deg,#6b7f4f,#6b7f4f)",
-    border: "none",
-    borderRadius: "30px",
-    padding: "10px 20px",
-    fontWeight: "600",
-    color: "#f1ebcc",
-    cursor: "pointer",
-  },
-"@media (max-width: 430px)": {
-  sheet: {
-    width: "100vw",
-    height: "75vh",
-  },
-  card: {
-    padding: "8px",
-    gap: "8px",
-  },
-  image: {
-    width: "55px",
-    height: "55px",
-  }
-}
-};
+const styles = {'badge': {'position': 'absolute', 'top': '-6px', 'right': '-6px', 'background': '#a0bebf', 'color': '#a0bebf', 'fontSize': '10px', 'fontWeight': 'bold', 'width': '18px', 'height': '18px', 'borderRadius': '50%', 'display': 'flex', 'alignItems': 'center', 'justifyContent': 'center'}, 'navbar': (mode) => ({'position': 'fixed', 'zIndex': 1000, 'background': 'rgba(160, 190, 191, 0.55)', 'backdropFilter': 'blur(10px)', 'WebkitBackdropFilter': 'blur(10px)', 'border': '1px solid rgba(255,255,255,0.25)', 'boxShadow': '0 8px 25px rgba(0,0,0,0.15)', 'borderRadius': '30px', 'display': 'flex', 'gap': '15px', ...(mode === 'vertical' ? {'top': '50%', 'left': '20px', 'transform': 'translateY(-50%)', 'flexDirection': 'column', 'width': '70px', 'height': 'auto', 'padding': '15px 0'} : {'bottom': '70px', 'left': '50%', 'transform': 'translateX(-50%)', 'flexDirection': 'row', 'justifyContent': 'space-around', 'alignItems': 'center', 'width': '90vw', 'maxWidth': '420px', 'height': '65px'})}), 'iconBtn': {'background': 'transparent', 'border': 'none', 'cursor': 'pointer', 'position': 'relative'}, 'icon': {'width': '35px', 'height': '35px'}, 'bigFavIcon': {'width': '30px', 'height': '30px'}, 'overlay': {'position': 'fixed', 'inset': 0, 'background': 'rgba(0,0,0,0.45)', 'zIndex': 1200}, 'sheet': {'position': 'fixed', 'bottom': 0, 'left': 0, 'width': '100vw', 'background': '#a0bebf', 'borderTopLeftRadius': '30px', 'borderTopRightRadius': '30px', 'boxShadow': '0 -4px 15px rgba(0,0,0,0.25)', 'padding': '5px', 'zIndex': 1300, 'height': '60vh', 'maxHeight': '85vh', 'overflow': 'hidden', 'display': 'flex', 'flexDirection': 'column'}, 'scroll': {'flex': 1, 'overflowY': 'auto', 'overflowX': 'hidden', 'paddingRight': '6px', 'WebkitOverflowScrolling': 'touch'}, 'toast': {'position': 'fixed', 'bottom': '90px', 'left': '50%', 'transform': 'translateX(-50%)', 'background': '#d15c1d', 'color': '#f1ebcc', 'padding': '10px 20px', 'borderRadius': '30px', 'fontSize': '14px', 'fontWeight': '600', 'boxShadow': '0 4px 10px rgba(0,0,0,0.2)', 'zIndex': 2000}, 'title': {'fontSize': '1.2rem', 'fontWeight': '700', 'marginBottom': '12px', 'textAlign': 'center', 'color': '#f1ebcc'}, 'emptyText': {'textAlign': 'center', 'color': '#f1ebcc ', 'marginTop': '20px'}, 'card': {'display': 'flex', 'alignItems': 'center', 'gap': '10px', 'background': '#f1ebcc', 'borderRadius': '20px', 'padding': '10px', 'boxShadow': '0 2px 6px rgba(0,0,0,0.08)'}, 'name': {'fontSize': '0.9rem', 'fontWeight': '600', 'color': '#493c33'}, 'price': {'fontSize': '0.8rem', 'fontWeight': '500', 'color': '#493c33'}, 'image': {'width': '60px', 'height': '60px', 'borderRadius': '18px', 'objectFit': 'cover', 'border': '1px solid #f2a72d'}, 'details': {'flex': 1, 'display': 'flex', 'flexDirection': 'column', 'gap': '5px'}, 'qtyBtn': {'backgroundColor': '#fff', 'borderRadius': '50%', 'width': '28px', 'height': '28px', 'display': 'flex', 'alignItems': 'center', 'justifyContent': 'center', 'boxShadow': '0 2px 4px rgba(0,0,0,0.1)', 'border': 'none', 'padding': '0', 'cursor': 'pointer'}, 'deleteIcon': {'width': '28px', 'height': '28px', 'cursor': 'pointer'}, 'smallIcon': {'width': '22px', 'height': '22px', 'cursor': 'pointer'}, 'favActions': {'display': 'flex', 'gap': '22px', 'alignItems': 'center'}, 'footer': {'marginTop': '10px', 'display': 'flex', 'justifyContent': 'space-between', 'alignItems': 'center', 'borderTop': '1px solid #f2a72d', 'paddingTop': '10px'}, 'total': {'fontSize': '1rem', 'color': '#f1ebcc', 'fontWeight': '600'}, 'checkoutBtn': {'background': 'linear-gradient(90deg,#6b7f4f,#6b7f4f)', 'border': 'none', 'borderRadius': '30px', 'padding': '10px 20px', 'fontWeight': '600', 'color': '#f1ebcc', 'cursor': 'pointer'}, '@media (max-width: 430px)': {'sheet': {'width': '100vw', 'height': '75vh'}, 'card': {'padding': '8px', 'gap': '8px'}, 'image': {'width': '55px', 'height': '55px'}}, 'loadingBar': {'height': '4px', 'background': 'linear-gradient(to right, #f2a72d, #d15c1d)', 'position': 'absolute', 'top': 0, 'left': 0, 'width': '100%'}};
