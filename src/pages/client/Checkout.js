@@ -1,26 +1,24 @@
-/* global Moyasar */
-
+/* global Moyasar */ // موجود، لكن مع dynamic load مش ضروري
 import React, { useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   getUserById,
-  
   removeFromCart,
   updateUser,
   updateCartItem,
-  createOrder,
+  createOrder, // غير لو اسمها createOrderWithPaymentId
   uploadPaymentProof,
   createOrderWithProof,
 } from "../../api/api";
 import BottomNav from "../../components/BottomNav";
-
 import { useNavigate } from "react-router-dom";
-const API_BASE = process.env.REACT_APP_API_BASE; // ✅ من env
+import axios from 'axios'; // install npm i axios لو مش موجود، للـ API calls
+const API_BASE = process.env.REACT_APP_API_BASE;
 const Checkout = () => {
   const userId = JSON.parse(localStorage.getItem("user"))?._id;
   const [user, setUser] = useState(null);
   const [cart, setCart] = useState([]);
-    const [isEditing, setIsEditing] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const plusIcon = "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968591/plus_xwrg7i.svg";
   const minusIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968578/minus_rpgpcr.svg";
@@ -32,19 +30,32 @@ const Checkout = () => {
     phone: "",
     location: "",
     latitude: null,
-    longitude: null,
+    longitude: "",
     address: "",
+    city: "",
+    neighborhood: "",
+    street: "",
+    nearestLandmark: "",
   });
   const [copiedField, setCopiedField] = useState(null);
   const [alertMessage, setAlertMessage] = useState("");
   const navigate = useNavigate();
-const totalProducts = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-const delivery = 20;
-const total = totalProducts + delivery;
-
-   const PUBLIC_KEY = "pk_test_Q7YDAzTTP2WUQqyLGdHD9vSms6596uWUziq1Xu1x"; // ضعي المفتاح هنا
-
-  // ✅ دالة لتحديد رابط الصورة الصحيح سواء من Cloudinary أو من السيرفر
+  const totalProducts = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const delivery = 20;
+  const total = totalProducts + delivery;
+  const PUBLIC_KEY = "pk_test_Q7YDAzTTP2WUQqyLGdHD9vSms6596uWUziq1Xu1x"; // test key
+  // ✅ تحميل Moyasar SDK dynamically
+  useEffect(() => {
+    const script = document.createElement('script');
+    script.src = 'https://js.moyasar.com/v1/moyasar.js';
+    script.async = true;
+    script.onload = () => console.log('✅ Moyasar SDK loaded');
+    script.onerror = () => console.error('❌ Failed to load Moyasar SDK');
+    document.head.appendChild(script);
+    return () => {
+      document.head.removeChild(script);
+    };
+  }, []);
   const getImageUrl = (path) => {
     if (!path) return "";
     if (path.startsWith("http")) return path;
@@ -53,7 +64,6 @@ const total = totalProducts + delivery;
   useEffect(() => {
     if (userId) {
       loadUser();
-      
     }
   }, [userId]);
   const loadUser = async () => {
@@ -66,18 +76,19 @@ const total = totalProducts + delivery;
       phone: res.data.phone || "",
       location: res.data.location || "",
       address: res.data.address || "",
+      city: res.data.city || "",
+      neighborhood: res.data.neighborhood || "",
+      street: res.data.street || "",
+      nearestLandmark: res.data.nearestLandmark || "",
     });
   };
-    const handleRemoveItem = async (itemId) => {
-    // ✅ تحديث محلي سلس: إزالة العنصر فورًا
+  const handleRemoveItem = async (itemId) => {
     const updatedCart = cart.filter((item) => item._id !== itemId);
     setCart(updatedCart);
     try {
       await removeFromCart(userId, itemId);
-      // لا إعادة جلب هنا للسلاسة
     } catch (err) {
       console.error("Failed to remove from cart:", err);
-      // rollback إذا فشل
       await loadUser();
     }
   };
@@ -91,26 +102,25 @@ const total = totalProducts + delivery;
             `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&addressdetails=1&accept-language=ar`
           );
           const geoData = await geoRes.json();
-          let addressStr = "";
+          let city = "";
+          let neighborhood = "";
+          let street = "";
+          let nearestLandmark = ""; // يمكن ملؤه يدويًا، أو استخدام display_name إذا لزم
           if (geoData.address) {
-            const city =
-              geoData.address.city ||
-              geoData.address.town ||
-              geoData.address.village ||
-              "";
-            const suburb =
-              geoData.address.suburb ||
-              geoData.address.neighbourhood ||
-              "";
-            const road = geoData.address.road || "";
-            addressStr = [city, suburb, road].filter(Boolean).join(", ");
+            city = geoData.address.city || geoData.address.town || geoData.address.village || "";
+            neighborhood = geoData.address.suburb || geoData.address.neighbourhood || "";
+            street = geoData.address.road || "";
+            nearestLandmark = geoData.address.amenity || geoData.address.shop || ""; // اقتراح، يمكن تعديله
           }
           setEditData({
             ...editData,
             latitude,
             longitude,
             location: link,
-            address: addressStr,
+            city,
+            neighborhood,
+            street,
+            nearestLandmark,
           });
         } catch (geoErr) {
           console.error("Error fetching address:", geoErr);
@@ -119,7 +129,10 @@ const total = totalProducts + delivery;
             latitude,
             longitude,
             location: link,
-            address: "",
+            city: "",
+            neighborhood: "",
+            street: "",
+            nearestLandmark: "",
           });
         }
       });
@@ -132,104 +145,91 @@ const total = totalProducts + delivery;
     await loadUser();
     setIsEditing(false);
   };
-
-
   const updateQuantity = async (itemId, newQty) => {
     if (newQty <= 0) {
       await handleRemoveItem(itemId);
       return;
     }
-    // 🔥 إيجاد المنتج في السلة
     const itemIndex = cart.findIndex((i) => i._id === itemId);
     if (itemIndex === -1) return;
     const item = cart[itemIndex];
     const currentQty = item.quantity;
-    // 🔥 المخزون الحقيقي (من populate)
-    const stock = item.product?.stock || 0; // أو جلب stock إذا لزم
-    // إذا newQty أكبر من stock → عرض تنبيه
+    const stock = item.product?.stock || 0;
     if (newQty > stock) {
       setAlertMessage(`لا يمكنك إضافة أكثر من ${stock} من هذا المنتج`);
       setTimeout(() => setAlertMessage(""), 2500);
       return;
     }
-    // ✅ تحديث محلي سلس (optimistic update)
     const updatedCart = [...cart];
     updatedCart[itemIndex] = { ...item, quantity: newQty };
     setCart(updatedCart);
     try {
       await updateCartItem(userId, itemId, { quantity: newQty });
-      // لا إعادة جلب هنا للسلاسة
     } catch (err) {
       console.error("Failed to update quantity:", err);
-      // ✅ rollback إذا فشل
       updatedCart[itemIndex] = { ...item, quantity: currentQty };
       setCart(updatedCart);
       setAlertMessage("حدث خطأ أثناء تحديث الكمية 😔");
       setTimeout(() => setAlertMessage(""), 2500);
     }
   };
-
-
-const handlePay = () => {
-  if (!window.Moyasar) {
-    alert("خطأ: مكتبة الدفع لم يتم تحميلها.");
-    return;
-  }
-
-  window.Moyasar.init({
-    element: ".moyasar-form",
-    amount: total * 100, // هللة
-    currency: "SAR",
-    description: `طلب جديد من ${user.firstName}`,
-    publishable_api_key: PUBLIC_KEY,
-    methods: ["creditcard"],
-
-callback_url: "https://poiseback.onrender.com/api/payment/callback",
-  success_url: "https://tarafront.vercel.app/payment-success",
-  failure_url: "https://tarafront.vercel.app/payment-failed",
-
-    on_completed: async (payment) => {
-      console.log("🔔 Result from Moyasar:", payment);
-
-      const paymentStatus = payment.status === "paid" ? "paid" : "failed";
-
-      if (paymentStatus === "paid") {
-        try {
-          await createOrder({
-            user: userId,
-            items: cart.map((item) => ({
-              product: item.product._id || item.product,
-              name: item.name,
-              price: item.price,
-              mainImage: item.mainImage,
-              quantity: item.quantity,
-            })),
-            shipping: {
-              name: `${user.firstName} ${user.lastName}`,
-              phone: user.phone,
-              address: user.address || "",
-              coords: [user.longitude, user.latitude],
-            },
-            subtotal: totalProducts,
-            delivery,
-            total,
-            paymentId: payment.id,
-            paymentStatus: paymentStatus, // 👈 المهم هنا
-          });
-
-          alert("تم الدفع بنجاح وإنشاء الطلب ");
-          navigate("/my-orders");
-        } catch (err) {
-          console.error("Create Order Error: ", err);
-          alert("حدث خطأ أثناء إنشاء الطلب، الرجاء التواصل مع الدعم.");
+  const handlePay = () => {
+    if (!window.Moyasar) {
+      setAlertMessage("خطأ: مكتبة Moyasar لم يتم تحميلها. جرب إعادة تحميل الصفحة.");
+      setTimeout(() => setAlertMessage(""), 3000);
+      return;
+    }
+    window.Moyasar.init({
+      element: ".moyasar-form",
+      amount: total * 100, // هللة
+      currency: "SAR",
+      description: `طلب جديد من ${user.firstName} ${user.lastName}`,
+      publishable_api_key: PUBLIC_KEY,
+      callback_url: `${API_BASE}/api/payment/callback`, // backend endpoint
+      methods: ["creditcard"],
+      supported_networks: ["visa", "mastercard", "mada"], // أضفته لدعم mada
+      on_completed: async (payment) => {
+        console.log("🔔 Payment initiated from Moyasar:", payment);
+        if (payment.status === "initiated") {
+          try {
+            // 🟢 أنشئ order "pending" في Mongo مع paymentId
+            const orderData = {
+              user: userId,
+              items: cart.map((item) => ({
+                product: item.product._id || item.product,
+                name: item.name,
+                price: item.price,
+                mainImage: item.mainImage,
+                quantity: item.quantity,
+              })),
+              shipping: {
+                name: `${user.firstName} ${user.lastName}`,
+                phone: user.phone,
+                address: `${user.city || ''}, ${user.neighborhood || ''}, ${user.street || ''}, ${user.nearestLandmark || ''}`.trim(), // جمع العنوان من الحقول الجديدة
+                coords: [user.longitude, user.latitude],
+              },
+              subtotal: totalProducts,
+              delivery,
+              total,
+              paymentId: payment.id,
+              paymentStatus: "initiated", // pending حتى verification
+            };
+            await createOrder(orderData); // أو axios.post(`${API_BASE}/api/orders`, orderData)
+            console.log("✅ Order created with pending status");
+            // أفرغ السلة محلياً (optimistic)
+            setCart([]);
+          } catch (err) {
+            console.error("Create Order Error:", err);
+            setAlertMessage("حدث خطأ أثناء إنشاء الطلب. الرجاء المحاولة مرة أخرى.");
+            setTimeout(() => setAlertMessage(""), 3000);
+          }
+        } else {
+          setAlertMessage("فشل في بدء عملية الدفع.");
+          setTimeout(() => setAlertMessage(""), 3000);
         }
-      } else {
-        alert("فشل الدفع! لم يتم إنشاء الطلب ");
-      }
-    },
-  });
-};
-
+      },
+    });
+  };
   return (
     <>
       <div style={styles.page}>
@@ -266,7 +266,10 @@ callback_url: "https://poiseback.onrender.com/api/payment/callback",
                       "لم يتم تحديد الموقع"
                     )}
                   </p>
-                  {user.address && <p><b>العنوان:</b> {user.address}</p>}
+                  {user.city && <p><b>المدينة:</b> {user.city}</p>}
+                  {user.neighborhood && <p><b>الحي:</b> {user.neighborhood}</p>}
+                  {user.street && <p><b>الشارع:</b> {user.street}</p>}
+                  {user.nearestLandmark && <p><b>أقرب معلم:</b> {user.nearestLandmark}</p>}
                   {user.latitude && user.longitude && (
                     <iframe
                       title="map"
@@ -307,7 +310,7 @@ callback_url: "https://poiseback.onrender.com/api/payment/callback",
                     style={styles.input}
                   />
                   <button style={styles.smallBtn} onClick={handleUpdateLocation}>
-                     تحديد موقعي الحالي
+                    تحديد موقعي الحالي
                   </button>
                   <input
                     type="text"
@@ -320,9 +323,38 @@ callback_url: "https://poiseback.onrender.com/api/payment/callback",
                   />
                   <input
                     type="text"
-                    value={editData.address}
-                    readOnly
-                    placeholder="العنوان (المدينة، الحي، الشارع)"
+                    value={editData.city}
+                    onChange={(e) =>
+                      setEditData({ ...editData, city: e.target.value })
+                    }
+                    placeholder="المدينة"
+                    style={styles.input}
+                  />
+                  <input
+                    type="text"
+                    value={editData.neighborhood}
+                    onChange={(e) =>
+                      setEditData({ ...editData, neighborhood: e.target.value })
+                    }
+                    placeholder="الحي"
+                    style={styles.input}
+                  />
+                  <input
+                    type="text"
+                    value={editData.street}
+                    onChange={(e) =>
+                      setEditData({ ...editData, street: e.target.value })
+                    }
+                    placeholder="الشارع"
+                    style={styles.input}
+                  />
+                  <input
+                    type="text"
+                    value={editData.nearestLandmark}
+                    onChange={(e) =>
+                      setEditData({ ...editData, nearestLandmark: e.target.value })
+                    }
+                    placeholder="أقرب معلم"
                     style={styles.input}
                   />
                   {editData.latitude && editData.longitude && (
@@ -335,13 +367,13 @@ callback_url: "https://poiseback.onrender.com/api/payment/callback",
                     ></iframe>
                   )}
                   <button style={styles.smallBtn} onClick={handleSaveEdit}>
-                     حفظ التعديل
+                    حفظ التعديل
                   </button>
                 </div>
               )}
             </div>
           )}
-                   {/* 🛍️ المنتجات */}
+          {/* 🛍️ المنتجات */}
           <h2 style={styles.header}>المنتجات</h2>
           <div style={styles.box}>
             {cart.length > 0 ? (
@@ -395,18 +427,17 @@ callback_url: "https://poiseback.onrender.com/api/payment/callback",
             <p>سعر التوصيل: {delivery} ر.س</p>
             <hr />
             <h3>الإجمالي: {total} ر.س</h3>
-           <button
-  style={styles.confirmBtn}
-  onClick={handlePay}
->
-  ادفع الآن
-</button>
-
+            <button
+              style={styles.confirmBtn}
+              onClick={handlePay}
+              disabled={submitting} // لمنع clicks متعددة
+            >
+              {submitting ? "جاري الدفع..." : "ادفع الآن"}
+            </button>
           </div>
         </motion.div>
       </div>
-<div className="moyasar-form"></div>
-
+      <div className="moyasar-form"></div> {/* Moyasar form container */}
       <BottomNav />
       {/* 🔔 Toast */}
       <AnimatePresence>
