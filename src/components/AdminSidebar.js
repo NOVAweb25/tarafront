@@ -3,20 +3,16 @@ import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { fonts, iconSizes } from "../utils/theme";
 import { logoutUser } from "../api/api";
-import { messaging } from "../firebase";
-import { onMessage } from "firebase/messaging";
 import axios from "axios";
 
 const AdminSidebar = () => {
-  const [isOpen, setIsOpen] = useState(true);  // تصحيح الخطأ هنا
+  const [isOpen, setIsOpen] = useState(true);
   const [openAdminMenu, setOpenAdminMenu] = useState(false);
   const [openAccountMenu, setOpenAccountMenu] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
-  const [toast, setToast] = useState(null);
-  const navigate = useNavigate();
   const [pendingOrdersCount, setPendingOrdersCount] = useState(0);
-  const [position, setPosition] = useState(10);  // State جديد للموقع (right: position px)
-const sidebarRef = React.useRef(null);
+  const [position, setPosition] = useState(10); // State جديد للموقع (right: position px)
+  const sidebarRef = React.useRef(null);
   const API_BASE = process.env.REACT_APP_API_BASE;
   const productIcon =
     "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968618/productMang_p66aul.svg";
@@ -28,6 +24,7 @@ const sidebarRef = React.useRef(null);
     "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968581/logo_revtav.svg";
   const toggleIcon =
     "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968565/back_xur01t.svg";
+  const navigate = useNavigate();
 
   const handleLogout = () => {
     // 🔥 بث حدث تسجيل الخروج
@@ -50,61 +47,40 @@ const sidebarRef = React.useRef(null);
   useEffect(() => {
     loadNotifications();
     const interval = setInterval(loadNotifications, 15000);
-    onMessage(messaging, (payload) => {
-      const { title, body } = payload.notification;
-      setToast({ title, body });
-      setTimeout(() => setToast(null), 5000);
-      if (title.includes("طلب جديد")) {
-        setPendingOrdersCount((prev) => prev + 1);
-      }
-      loadNotifications();
-    });
     return () => clearInterval(interval);
   }, []);
 
   return (
     <>
-      {toast && (
-        <motion.div
-          initial={{ y: -80, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          exit={{ y: -80, opacity: 0 }}
-          transition={{ duration: 0.4 }}
-          style={styles.toast}
-        >
-          <strong>{toast.title}</strong>
-          <p>{toast.body}</p>
-        </motion.div>
-      )}
-     <motion.div
-  ref={sidebarRef}
-  drag="x"  // سحب أفقي فقط
-  dragConstraints={{ left: 0, right: window.innerWidth - 240 }}  // نطاق: من اليسار لحد اليمين داخل الشاشة
-  dragMomentum={false}  // ما يتحركش لوحده
-  whileDrag={{ scale: 1.05 }}  // تصحيح الخطأ: تكبير بسيط أثناء السحب
-  onDragEnd={(e, { point }) => {
-    // حساب الموقع الجديد (left position)
-    const newLeft = point.x - 120;  // 120 = نص عرض الـ sidebar عشان يمسك من الوسط
-    // حدّد بين 0 و (عرض الشاشة - عرض الـ sidebar)
-    setPosition(Math.max(0, Math.min(newLeft, window.innerWidth - 240)));
-  }}
-  animate={{
-    width: isOpen ? 240 : 60,
-    height: isOpen ? "auto" : 60,
-    borderRadius: isOpen ? "16px" : "50%",
-    padding: isOpen ? "12px 8px" : "10px",
-    left: position,  // غيّرت لـ left بدل right
-  }}
-  transition={{ duration: 0.4 }}
-  style={{
-    ...styles.sidebar,
-    top: "60px",
-    overflow: "hidden",
-    cursor: "grab",  // يظهر كـ draggable
-    position: "fixed",  // تأكيد
-    right: "auto",  // إزالة right عشان ما يتعارضش
-  }}
->
+      <motion.div
+        ref={sidebarRef}
+        drag="x" // سحب أفقي فقط
+        dragConstraints={{ left: 0, right: window.innerWidth - 240 }} // نطاق: من اليسار لحد اليمين داخل الشاشة
+        dragMomentum={false} // ما يتحركش لوحده
+        whileDrag={{ scale: 1.05 }} // تصحيح الخطأ: تكبير بسيط أثناء السحب
+        onDragEnd={(e, { point }) => {
+          // حساب الموقع الجديد (left position)
+          const newLeft = point.x - 120; // 120 = نص عرض الـ sidebar عشان يمسك من الوسط
+          // حدّد بين 0 و (عرض الشاشة - عرض الـ sidebar)
+          setPosition(Math.max(0, Math.min(newLeft, window.innerWidth - 240)));
+        }}
+        animate={{
+          width: isOpen ? 240 : 60,
+          height: isOpen ? "auto" : 60,
+          borderRadius: isOpen ? "16px" : "50%",
+          padding: isOpen ? "12px 8px" : "10px",
+          left: position, // غيّرت لـ left بدل right
+        }}
+        transition={{ duration: 0.4 }}
+        style={{
+          ...styles.sidebar,
+          top: "60px",
+          overflow: "hidden",
+          cursor: "grab", // يظهر كـ draggable
+          position: "fixed", // تأكيد
+          right: "auto", // إزالة right عشان ما يتعارضش
+        }}
+      >
         {/* باقي الكود زي ما هو – ما غيّرت حاجة تانية */}
         {isOpen && (
           <div style={styles.logoContainer}>

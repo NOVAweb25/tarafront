@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { logoutUser } from "../api/api";
-import { listenToMessages } from "../firebase";
 
 const ClientNavbar = () => {
   const [user, setUser] = useState(null);
@@ -11,53 +10,22 @@ const ClientNavbar = () => {
   const [showMenu, setShowMenu] = useState(false);
   const menuRef = useRef(null);
   const navigate = useNavigate();
-  const [hasOrderNotification, setHasOrderNotification] = useState({
-  active: false,
-  message: "",
-});
-const accountIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1764962209/person_iwqjor.svg";
+  const accountIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1764962209/person_iwqjor.svg";
+  const logo= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968581/logo_revtav.svg";
 
-const logo= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968581/logo_revtav.svg";
-
-
-useEffect(() => {
-  const savedUser = JSON.parse(localStorage.getItem("user"));
-  if (savedUser) setUser(savedUser);
-
-  // 🔹 عند تغيير بيانات المستخدم في أي مكان داخل الموقع
-  const handleAuthChange = () => {
-    const updatedUser = JSON.parse(localStorage.getItem("user"));
-    setUser(updatedUser || null);
-    setShowAuthModal(false);
-  };
-
-  // 🔹 عند تسجيل الدخول أو الخروج في أي مكان
-  window.addEventListener("authChange", handleAuthChange);
-  return () => window.removeEventListener("authChange", handleAuthChange);
-}, []);
-
-// ✅ خارج الـ useEffect السابق
-useEffect(() => {
-  listenToMessages((payload) => {
-    const title = payload?.title || "";
-    const body = payload?.body || "";
-
-    // 🔹 إذا كان الإشعار يخص تحديث الطلب
-    if (title.includes("تحديث") || body.includes("تحديث")) {
-      // مثال على استخراج رقم الطلب من النص (مثل "طلب رقم 123")
-      const match = body.match(/(\d+)/);
-      const orderNumber = match ? `#${match[1]}` : "";
-
-      setHasOrderNotification({
-        active: true,
-        message: `تم تحديث حالة الطلب ${orderNumber}`,
-      });
-    }
-  });
-}, []);
-
-
-
+  useEffect(() => {
+    const savedUser = JSON.parse(localStorage.getItem("user"));
+    if (savedUser) setUser(savedUser);
+    // 🔹 عند تغيير بيانات المستخدم في أي مكان داخل الموقع
+    const handleAuthChange = () => {
+      const updatedUser = JSON.parse(localStorage.getItem("user"));
+      setUser(updatedUser || null);
+      setShowAuthModal(false);
+    };
+    // 🔹 عند تسجيل الدخول أو الخروج في أي مكان
+    window.addEventListener("authChange", handleAuthChange);
+    return () => window.removeEventListener("authChange", handleAuthChange);
+  }, []);
 
   // ✅ إغلاق القائمة عند النقر خارجها
   useEffect(() => {
@@ -68,35 +36,29 @@ useEffect(() => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // ✅ تسجيل الخروج
- // ✅ تسجيل الخروج (مُحدّثة)
-const handleLogout = async () => {
-  try {
-    await logoutUser();
-  } catch (err) {
-    console.error("Logout failed:", err);
-  }
-
-  // 🔹 حذف بيانات المستخدم من التخزين
-  localStorage.removeItem("user");
-  localStorage.removeItem("token");
-
-  // ✅ إغلاق أي نوافذ مفتوحة
-  setShowLogoutModal(false);
-  setShowMenu(false);
-
-  // ✅ تحديث الحالة محليًا
-  setUser(null);
-
-  // ✅ بث أحداث عامة ليعرف كل الموقع أن العميل خرج
-  setTimeout(() => {
-    window.dispatchEvent(new Event("authChange"));
-    window.dispatchEvent(new Event("logout"));
-  }, 50);
-
-  // ✅ توجيه المستخدم للصفحة الرئيسية (اختياري)
-  navigate("/");
-};
+  // ✅ تسجيل الخروج (مُحدّثة)
+  const handleLogout = async () => {
+    try {
+      await logoutUser();
+    } catch (err) {
+      console.error("Logout failed:", err);
+    }
+    // 🔹 حذف بيانات المستخدم من التخزين
+    localStorage.removeItem("user");
+    localStorage.removeItem("token");
+    // ✅ إغلاق أي نوافذ مفتوحة
+    setShowLogoutModal(false);
+    setShowMenu(false);
+    // ✅ تحديث الحالة محليًا
+    setUser(null);
+    // ✅ بث أحداث عامة ليعرف كل الموقع أن العميل خرج
+    setTimeout(() => {
+      window.dispatchEvent(new Event("authChange"));
+      window.dispatchEvent(new Event("logout"));
+    }, 50);
+    // ✅ توجيه المستخدم للصفحة الرئيسية (اختياري)
+    navigate("/");
+  };
 
   // ✅ التعامل مع الزائر
   const handleGuestClick = () => {
@@ -120,7 +82,6 @@ const handleLogout = async () => {
             <img src={logo} alt="Logo" style={styles.logo} />
           </div>
         </div>
-
         {/* 👤 أيقونة المستخدم في اليمين */}
         <div style={styles.userContainer} ref={menuRef}>
           <div
@@ -136,7 +97,6 @@ const handleLogout = async () => {
               </span>
             )}
           </div>
-
           {/* 🔽 القائمة المنسدلة */}
           <AnimatePresence>
             {showMenu && (
@@ -155,29 +115,14 @@ const handleLogout = async () => {
                 >
                   حسابي
                 </button>
-
-              <button
-  style={{ ...styles.dropdownItem, position: "relative" }}
-  onClick={() => {
-    user ? navigate("/my-orders") : handleGuestClick();
-    setHasOrderNotification({ active: false, message: "" });
-  }}
->
-  طلباتي
- {hasOrderNotification.active && (
-  <div style={styles.notificationBubble}>
-    <span style={styles.notificationIcon}>!</span>
-    <span style={styles.notificationText}>
-      {hasOrderNotification.message}
-    </span>
-  </div>
-)}
-
-</button>
-
-
-
-
+                <button
+                  style={{ ...styles.dropdownItem, position: "relative" }}
+                  onClick={() => {
+                    user ? navigate("/my-orders") : handleGuestClick();
+                  }}
+                >
+                  طلباتي
+                </button>
                 {/* ✅ يظهر فقط عند وجود مستخدم */}
                 {user && (
                   <motion.button
@@ -194,7 +139,6 @@ const handleLogout = async () => {
           </AnimatePresence>
         </div>
       </nav>
-
       {/* ✅ نافذة تأكيد تسجيل الخروج */}
       <AnimatePresence>
         {showLogoutModal && (
@@ -229,7 +173,6 @@ const handleLogout = async () => {
           </motion.div>
         )}
       </AnimatePresence>
-
       {/* ✅ نافذة الزائر (Bottom Sheet) */}
       <AnimatePresence>
         {showAuthModal && (
@@ -249,7 +192,7 @@ const handleLogout = async () => {
               transition={{ duration: 0.35 }}
             >
               <p style={styles.authMessage}>
-انضم الينا لتجربة شراء كاملة               </p>
+انضم الينا لتجربة شراء كاملة </p>
               <div style={styles.authActions}>
                 <button
                   style={styles.joinButton}
@@ -279,7 +222,6 @@ const handleLogout = async () => {
 };
 
 export default ClientNavbar;
-
 const styles = {
   navbar: {
     position: "fixed",
