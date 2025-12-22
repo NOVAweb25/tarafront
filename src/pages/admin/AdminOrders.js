@@ -1,14 +1,11 @@
 import React, { useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import NotificationPopup from "../../components/NotificationPopup";
-import { requestNotificationPermission, listenToMessages } from "../../firebase";
 import { Share2 } from "lucide-react";
 import { getOrders, getOrderById, updateOrder } from "../../api/api";
 import "./AdminOrders.css";
 import AdminSidebar from "../../components/AdminSidebar";
 
 const API_BASE = process.env.REACT_APP_API_BASE;
-
 
 const AdminOrders = () => {
   const [orders, setOrders] = useState([]);
@@ -18,13 +15,11 @@ const AdminOrders = () => {
   const [selectedInvoice, setSelectedInvoice] = useState(null);
   const [invoiceData, setInvoiceData] = useState(null);
   const [activeStatusMenu, setActiveStatusMenu] = useState(null);
-  const [showPopup, setShowPopup] = useState(false);
   const filterRef = useRef(null);
-   const user = JSON.parse(localStorage.getItem("user"));
+  const user = JSON.parse(localStorage.getItem("user"));
 
-const SearchIcon = "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968618/search_ke1zur.svg";
-
-const invoiceIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968572/invoice_kkbd8p.svg";
+  const SearchIcon = "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968618/search_ke1zur.svg";
+  const invoiceIcon = "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968572/invoice_kkbd8p.svg";
 
   const statuses = [
     "بانتظار تأكيد الطلب",
@@ -45,43 +40,10 @@ const invoiceIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v176396857
     }
   };
 
-useEffect(() => {
-  if (user?.role !== "admin") return;
-  console.log("📍 Notification.permission (Admin):", Notification.permission);
-  if ("Notification" in window) {
-    if (Notification.permission === "default") {
-      setShowPopup(true);
-    } else if (Notification.permission === "granted") {
-      try {
-        requestNotificationPermission(user._id);
-      } catch (err) {
-        console.error("خطأ في طلب إذن الإشعارات:", err);
-        // هنا ممكن تعرض رسالة للمستخدم بدل وقف الـ app
-        alert("الإشعارات غير مدعومة على هذا الجهاز. يرجى التحقق لاحقاً.");
-      }
-    } else {
-      console.warn("⚠️ Notifications denied by user");
-    }
-  } else {
-    console.warn("🛑 Notifications API غير مدعوم في هذا المتصفح.");
-  }
-  // 🟢 استمع للإشعارات (أضف try-catch هنا أيضاً لو لازم)
-  try {
-    listenToMessages((notification) => {
-      loadOrders(); // أعد تحميل الطلبات
-      alert(`${notification.title}: ${notification.body}`);
-    });
-  } catch (err) {
-    console.error("خطأ في الاستماع للرسائل:", err);
-  }
-}, [user]);
-
-
-
-useEffect(() => {
-  // 🔹 عند فتح صفحة الطلبات، نعتبر التنبيهات مقروءة
-  window.dispatchEvent(new Event("ordersViewed"));
-}, []);
+  useEffect(() => {
+    // 🔹 عند فتح صفحة الطلبات، نعتبر التنبيهات مقروءة (حتى لو حذفت الإشعارات، ده مش متعلق مباشرة)
+    window.dispatchEvent(new Event("ordersViewed"));
+  }, []);
 
   useEffect(() => {
     loadOrders();
@@ -170,38 +132,16 @@ useEffect(() => {
   // 🟢 دالة لفتح الإيصال في تبويب جديد أو عرض الصورة داخلياً
   const openReceipt = (proofUrl) => {
     if (proofUrl.startsWith("http")) {
-  window.open(proofUrl, "_blank");
-} else {
-  window.open(`${API_BASE}${proofUrl}`, "_blank");
-}
-
+      window.open(proofUrl, "_blank");
+    } else {
+      window.open(`${API_BASE}${proofUrl}`, "_blank");
+    }
   };
 
-
-const allowNotifications = async () => {
-  try {
-    await requestNotificationPermission(user._id);
-    setShowPopup(false);
-    alert("سيتم تنبيهك عند وصول طلب جديد");
-  } catch (err) {
-    console.error("خطأ في تفعيل الإشعارات:", err);
-    setShowPopup(false); // أقفل الـ popup حتى لو error
-    alert("حدث خطأ أثناء تفعيل الإشعارات. يرجى التحقق من إعدادات المتصفح أو الجهاز.");
-  }
-};
-
-console.log("🔍 API_BASE =", API_BASE);
-
+  console.log("🔍 API_BASE =", API_BASE);
 
   return (
     <div className="admin-page">
-  {showPopup && (
-        <NotificationPopup
-          message="هل تريد تفعيل الإشعارات لتنبيهك عند وصول طلب جديد؟"
-          onAllow={allowNotifications}
-          onClose={() => setShowPopup(false)}
-        />
-      )}
       <AdminSidebar />
       <div className="admin-content">
         <h2 className="page-title">إدارة الطلبات</h2>
@@ -215,7 +155,6 @@ console.log("🔍 API_BASE =", API_BASE);
             className="search-input wide"
           />
           <img src={SearchIcon} alt="بحث" className="search-icon" />
-
         </div>
         <div className="filterContainer">
           <select
@@ -231,104 +170,99 @@ console.log("🔍 API_BASE =", API_BASE);
             ))}
           </select>
         </div>
-       
+
         {/* Orders List */}
         <div className="orders-list">
           {orders.length > 0 ? (
-  orders.map((order) => (
-    <motion.div
-      key={order._id}
-      className="order-card"
-      layout
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, scale: 0.95 }}
-    >
-      <div className="order-info">
-        <div className="order-number">طلب #{order.orderNumber}</div>
-        <div className="client-name">
-          {order.user?.firstName} {order.user?.lastName}
-        </div>
-        <div className="phone">{order.user?.phone}</div>
-      </div>
-
-      <div className="order-actions">
-        {/* زر الفاتورة */}
-        <motion.button
-          className="invoice-circle"
-          whileTap={{ scale: 0.9 }}
-          onClick={() => openInvoice(order._id)}
-        >
-          <img src={invoiceIcon} alt="فاتورة" />
-        </motion.button>
-
-        {/* زر الحالة */}
-        <div
-          className="status-btn"
-          onClick={() =>
-            setActiveStatusMenu(
-              activeStatusMenu === order._id ? null : order._id
-            )
-          }
-        >
-          <span className="status-text">{order.status}</span>
-        </div>
-      </div>
-
-      {/* ✅ نافذة منبثقة لتحديث حالة الطلب */}
-      <AnimatePresence>
-        {activeStatusMenu === order._id && (
-          <>
-            {/* الخلفية */}
-            <motion.div
-              className="modal-overlay"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setActiveStatusMenu(null)}
-            />
-
-            {/* النافذة */}
-            <motion.div
-              className="status-popup"
-              initial={{ opacity: 0, scale: 0.85 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.85 }}
-              transition={{ duration: 0.3, ease: "easeOut" }}
-            >
-              <div className="popup-header">
-                <h3>تحديث حالة الطلب #{order.orderNumber}</h3>
-                <button
-                  className="close-popup"
-                  onClick={() => setActiveStatusMenu(null)}
-                >
-                  ✕
-                </button>
-              </div>
-
-              <div className="popup-body">
-                {statuses.map((s) => (
-                  <div
-                    key={s}
-                    className={`popup-option ${
-                      s === order.status ? "active" : ""
-                    }`}
-                    onClick={() => updateStatus(order._id, s)}
-                  >
-                    {s}
+            orders.map((order) => (
+              <motion.div
+                key={order._id}
+                className="order-card"
+                layout
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+              >
+                <div className="order-info">
+                  <div className="order-number">طلب #{order.orderNumber}</div>
+                  <div className="client-name">
+                    {order.user?.firstName} {order.user?.lastName}
                   </div>
-                ))}
-              </div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
-    </motion.div>
-  ))
-) : (
-  <p className="no-orders">لا توجد طلبات</p>
-)}
-</div>
+                  <div className="phone">{order.user?.phone}</div>
+                </div>
+                <div className="order-actions">
+                  {/* زر الفاتورة */}
+                  <motion.button
+                    className="invoice-circle"
+                    whileTap={{ scale: 0.9 }}
+                    onClick={() => openInvoice(order._id)}
+                  >
+                    <img src={invoiceIcon} alt="فاتورة" />
+                  </motion.button>
+                  {/* زر الحالة */}
+                  <div
+                    className="status-btn"
+                    onClick={() =>
+                      setActiveStatusMenu(
+                        activeStatusMenu === order._id ? null : order._id
+                      )
+                    }
+                  >
+                    <span className="status-text">{order.status}</span>
+                  </div>
+                </div>
+                {/* ✅ نافذة منبثقة لتحديث حالة الطلب */}
+                <AnimatePresence>
+                  {activeStatusMenu === order._id && (
+                    <>
+                      {/* الخلفية */}
+                      <motion.div
+                        className="modal-overlay"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        onClick={() => setActiveStatusMenu(null)}
+                      />
+                      {/* النافذة */}
+                      <motion.div
+                        className="status-popup"
+                        initial={{ opacity: 0, scale: 0.85 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.85 }}
+                        transition={{ duration: 0.3, ease: "easeOut" }}
+                      >
+                        <div className="popup-header">
+                          <h3>تحديث حالة الطلب #{order.orderNumber}</h3>
+                          <button
+                            className="close-popup"
+                            onClick={() => setActiveStatusMenu(null)}
+                          >
+                            ✕
+                          </button>
+                        </div>
+                        <div className="popup-body">
+                          {statuses.map((s) => (
+                            <div
+                              key={s}
+                              className={`popup-option ${
+                                s === order.status ? "active" : ""
+                              }`}
+                              onClick={() => updateStatus(order._id, s)}
+                            >
+                              {s}
+                            </div>
+                          ))}
+                        </div>
+                      </motion.div>
+                    </>
+                  )}
+                </AnimatePresence>
+              </motion.div>
+            ))
+          ) : (
+            <p className="no-orders">لا توجد طلبات</p>
+          )}
+        </div>
         {/* Invoice Modal */}
         <AnimatePresence>
           {selectedInvoice && invoiceData && (
@@ -405,15 +339,14 @@ console.log("🔍 API_BASE =", API_BASE);
                     {invoiceData.items.map((item) => (
                       <div key={item._id} className="invoice-item">
                         <img
-  src={
-    item.product?.mainImage?.startsWith("http")
-      ? item.product.mainImage
-      : `${API_BASE}${item.product?.mainImage || item.mainImage}`
-  }
-  alt={item.product?.name || "منتج"}
-  className="product-img"
-/>
-
+                          src={
+                            item.product?.mainImage?.startsWith("http")
+                              ? item.product.mainImage
+                              : `${API_BASE}${item.product?.mainImage || item.mainImage}`
+                          }
+                          alt={item.product?.name || "منتج"}
+                          className="product-img"
+                        />
                         <div className="product-details">
                           <strong>{item.product?.name || item.name}</strong>
                           <p>
