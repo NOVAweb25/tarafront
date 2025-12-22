@@ -52,16 +52,28 @@ useEffect(() => {
     if (Notification.permission === "default") {
       setShowPopup(true);
     } else if (Notification.permission === "granted") {
-      requestNotificationPermission(user._id);
+      try {
+        requestNotificationPermission(user._id);
+      } catch (err) {
+        console.error("خطأ في طلب إذن الإشعارات:", err);
+        // هنا ممكن تعرض رسالة للمستخدم بدل وقف الـ app
+        alert("الإشعارات غير مدعومة على هذا الجهاز. يرجى التحقق لاحقاً.");
+      }
     } else {
       console.warn("⚠️ Notifications denied by user");
     }
+  } else {
+    console.warn("🛑 Notifications API غير مدعوم في هذا المتصفح.");
   }
-  // 🟢 استمع للإشعارات
-  listenToMessages((notification) => {
-    loadOrders(); // أعد تحميل الطلبات
-    alert(`${notification.title}: ${notification.body}`);
-  });
+  // 🟢 استمع للإشعارات (أضف try-catch هنا أيضاً لو لازم)
+  try {
+    listenToMessages((notification) => {
+      loadOrders(); // أعد تحميل الطلبات
+      alert(`${notification.title}: ${notification.body}`);
+    });
+  } catch (err) {
+    console.error("خطأ في الاستماع للرسائل:", err);
+  }
 }, [user]);
 
 
@@ -166,12 +178,17 @@ useEffect(() => {
   };
 
 
- const allowNotifications = async () => {
+const allowNotifications = async () => {
+  try {
     await requestNotificationPermission(user._id);
     setShowPopup(false);
-    alert(" سيتم تنبيهك عند وصول طلب جديد");
-  };
-
+    alert("سيتم تنبيهك عند وصول طلب جديد");
+  } catch (err) {
+    console.error("خطأ في تفعيل الإشعارات:", err);
+    setShowPopup(false); // أقفل الـ popup حتى لو error
+    alert("حدث خطأ أثناء تفعيل الإشعارات. يرجى التحقق من إعدادات المتصفح أو الجهاز.");
+  }
+};
 
 console.log("🔍 API_BASE =", API_BASE);
 

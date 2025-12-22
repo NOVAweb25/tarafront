@@ -1,4 +1,3 @@
-// src/pages/client/Account.js
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import BottomNav from "../../components/BottomNav";
@@ -10,7 +9,6 @@ import {
   updatePassword,
 } from "../../api/api";
 import "./Account.css";
-
 const Account = () => {
   const userId = JSON.parse(localStorage.getItem("user"))?._id;
   const [user, setUser] = useState(null);
@@ -20,19 +18,19 @@ const Account = () => {
    const [sheetError, setSheetError] = useState("");
 const editIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968570/edit_xmyhv0.svg";
 const closeIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968567/close_mcygjs.svg";
-
   const [editModal, setEditModal] = useState(null);
   const [step, setStep] = useState(1);
   const [currentPassword, setCurrentPassword] = useState("");
   const [newUsername, setNewUsername] = useState("");
   const [currentUsername, setCurrentUsername] = useState("");
   const [newPassword, setNewPassword] = useState("");
-
+  const [isSaving, setIsSaving] = useState(false);
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
   // 🟢 تحميل بيانات المستخدم
   useEffect(() => {
     if (userId) loadUser();
   }, [userId]);
-
   const loadUser = async () => {
     try {
       const res = await getUserById(userId);
@@ -51,9 +49,9 @@ const closeIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968567/
       console.error("Error loading user:", err);
     }
   };
-
   // 💾 حفظ البيانات العامة
   const handleSave = async () => {
+    setIsSaving(true);
     try {
       await updateUser(userId, formData);
       await loadUser();
@@ -62,29 +60,26 @@ const closeIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968567/
       setLocationDetected(false);
     } catch (err) {
       alert(err.response?.data?.message || "حدث خطأ أثناء حفظ البيانات");
+    } finally {
+      setIsSaving(false);
     }
   };
-
   // 📍 تحديد الموقع الذكي
   const detectLocation = () => {
     if (!navigator.geolocation) return alert("المتصفح لا يدعم تحديد الموقع");
-
     navigator.geolocation.getCurrentPosition(
       async (pos) => {
         const { latitude, longitude } = pos.coords;
         const url = `https://www.google.com/maps?q=${latitude},${longitude}`;
-
         try {
           const geoRes = await fetch(
             `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&accept-language=ar`
           );
           const geoData = await geoRes.json();
-
           const { city, town, village, suburb, neighbourhood, road } = geoData.address || {};
           const address = [city || town || village, suburb || neighbourhood, road]
             .filter(Boolean)
             .join("، ");
-
           setFormData((prev) => ({
             ...prev,
             latitude,
@@ -92,7 +87,6 @@ const closeIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968567/
             location: url,
             address: address || "لم يتم العثور على عنوان دقيق",
           }));
-
           setLocationDetected(true);
         } catch (err) {
           console.error("خطأ في جلب العنوان:", err);
@@ -108,7 +102,6 @@ const closeIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968567/
       (err) => alert("تعذر تحديد الموقع: " + err.message)
     );
   };
-
   // 🔒 النوافذ المنبثقة
   const resetModal = () => {
     setEditModal(null);
@@ -117,9 +110,12 @@ const closeIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968567/
     setNewUsername("");
     setCurrentUsername("");
     setNewPassword("");
+    setSheetError("");
+    setIsVerifying(false);
+    setIsUpdating(false);
   };
-
  const handleVerifyPassword = async () => {
+  setIsVerifying(true);
   try {
     const res = await verifyPassword({ userId, password: currentPassword });
     if (res.data.success) {
@@ -128,11 +124,12 @@ const closeIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968567/
     }
   } catch {
     setSheetError("كلمة المرور غير صحيحة");
+  } finally {
+    setIsVerifying(false);
   }
 };
-
-
   const handleUpdateUsername = async () => {
+    setIsUpdating(true);
     try {
       const res = await updateUsername({ userId, password: currentPassword, newUsername });
       if (res.data.success) {
@@ -142,20 +139,22 @@ const closeIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968567/
       }
     } catch {
       alert("حدث خطأ أثناء تحديث الاسم");
+    } finally {
+      setIsUpdating(false);
     }
   };
-
  const handleVerifyUsername = () => {
+  setIsVerifying(true);
   if (currentUsername === user.username) {
     setSheetError("");
     setStep(2);
   } else {
     setSheetError("اسم المستخدم غير صحيح");
   }
+  setIsVerifying(false);
 };
-
-
   const handleUpdatePassword = async () => {
+    setIsUpdating(true);
     try {
       const res = await updatePassword({ username: currentUsername, newPassword });
       if (res.data.success) {
@@ -164,11 +163,11 @@ const closeIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968567/
       }
     } catch {
       alert("حدث خطأ أثناء تحديث كلمة المرور");
+    } finally {
+      setIsUpdating(false);
     }
   };
-
   if (!user) return null;
-
   return (
     <>
       <div className="account-container">
@@ -179,7 +178,6 @@ const closeIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968567/
           transition={{ duration: 0.5 }}
         >
           <h2 className="account-title">حسابي</h2>
-
           {/* الاسم */}
           <div className="info-row">
             <div className="info-label">الاسم</div>
@@ -206,7 +204,6 @@ const closeIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968567/
               onClick={() => setEditField(editField === "name" ? null : "name")}
             />
           </div>
-
           {/* رقم الجوال */}
           <div className="info-row">
             <div className="info-label">رقم الجوال</div>
@@ -226,7 +223,6 @@ const closeIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968567/
               onClick={() => setEditField(editField === "phone" ? null : "phone")}
             />
           </div>
-
           {/* الموقع */}
           <div className="map-section">
             <div className="map-header">
@@ -238,7 +234,6 @@ const closeIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968567/
                 onClick={() => setEditField(editField === "location" ? null : "location")}
               />
             </div>
-
             {/* عرض الخريطة المحفوظة دائمًا */}
             {formData.latitude && formData.longitude && (
               <iframe
@@ -247,7 +242,6 @@ const closeIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968567/
                 src={`https://maps.google.com/maps?q=${formData.latitude},${formData.longitude}&z=15&output=embed`}
               ></iframe>
             )}
-
             {/* تعديل الموقع فقط عند النقر على التعديل */}
             {editField === "location" && (
               <>
@@ -259,13 +253,11 @@ const closeIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968567/
                 <button className="btn-locate" onClick={detectLocation}>
                    موقعي الحالي
                 </button>
-
                 {formData.address && (
                   <div className="address-preview">
                     <strong> العنوان المكتشف:</strong> {formData.address}
                   </div>
                 )}
-
                 {locationDetected && formData.latitude && formData.longitude && (
                   <iframe
                     title="map-preview"
@@ -276,12 +268,10 @@ const closeIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968567/
               </>
             )}
           </div>
-
           {/* حفظ */}
-          <button className="btn-save" onClick={handleSave}>
-             حفظ التعديلات
+          <button className="btn-save" onClick={handleSave} disabled={isSaving}>
+             {isSaving ? "جاري الحفظ" : "حفظ التعديلات"}
           </button>
-
           {/* إعدادات */}
           <div className="account-actions">
             <button className="username-btn" onClick={() => setEditModal("username")}>
@@ -293,9 +283,7 @@ const closeIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968567/
           </div>
         </motion.div>
       </div>
-
       <BottomNav />
-
       {/* النوافذ المنبثقة */}
       <AnimatePresence>
         {editModal === "username" && (
@@ -311,7 +299,6 @@ const closeIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968567/
               <img src={closeIcon} alt="close" className="close-icon" onClick={resetModal} />
               <h3>تحديث اسم المستخدم</h3>
 {sheetError && <div className="sheet-alert">{sheetError}</div>}
-
               {step === 1 ? (
                 <>
                   <input
@@ -320,7 +307,9 @@ const closeIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968567/
                     value={currentPassword}
                     onChange={(e) => setCurrentPassword(e.target.value)}
                   />
-                  <button onClick={handleVerifyPassword}>تحقق</button>
+                  <button onClick={handleVerifyPassword} disabled={isVerifying}>
+                    {isVerifying ? "جاري التحقق" : "تحقق"}
+                  </button>
                 </>
               ) : (
                 <>
@@ -329,14 +318,15 @@ const closeIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968567/
                     value={newUsername}
                     onChange={(e) => setNewUsername(e.target.value)}
                   />
-                  <button onClick={handleUpdateUsername}>تحديث</button>
+                  <button onClick={handleUpdateUsername} disabled={isUpdating}>
+                    {isUpdating ? "جاري التحديث" : "تحديث"}
+                  </button>
                 </>
               )}
             </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
-
       <AnimatePresence>
         {editModal === "password" && (
           <motion.div className="overlay" onClick={resetModal}>
@@ -351,7 +341,6 @@ const closeIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968567/
               <img src={closeIcon} alt="close" className="close-icon" onClick={resetModal} />
              <h3>تحديث كلمة المرور</h3>
 {sheetError && <div className="sheet-alert">{sheetError}</div>}
-
               {step === 1 ? (
                 <>
                   <input
@@ -359,7 +348,9 @@ const closeIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968567/
                     value={currentUsername}
                     onChange={(e) => setCurrentUsername(e.target.value)}
                   />
-                  <button onClick={handleVerifyUsername}>تحقق</button>
+                  <button onClick={handleVerifyUsername} disabled={isVerifying}>
+                    {isVerifying ? "جاري التحقق" : "تحقق"}
+                  </button>
                 </>
               ) : (
                 <>
@@ -369,7 +360,9 @@ const closeIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968567/
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
                   />
-                  <button onClick={handleUpdatePassword}>تحديث</button>
+                  <button onClick={handleUpdatePassword} disabled={isUpdating}>
+                    {isUpdating ? "جاري التحديث" : "تحديث"}
+                  </button>
                 </>
               )}
             </motion.div>
@@ -379,5 +372,4 @@ const closeIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968567/
     </>
   );
 };
-
 export default Account;

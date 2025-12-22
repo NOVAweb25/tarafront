@@ -3,10 +3,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import { getMyOrders, addToCart, addFavorite } from "../../api/api";
 import { Share2 } from "lucide-react";
 import BottomNav from "../../components/BottomNav";
-import { getUserById } from "../../api/api";
+import { getUserById, getProductById } from "../../api/api";
 import NotificationPopup from "../../components/NotificationPopup";
 import { requestNotificationPermission, listenToMessages } from "../../firebase";
-
 import "./MyOrders.css";
 const API_BASE = process.env.REACT_APP_API_BASE; // ✅ من env
 const MyOrders = () => {
@@ -21,7 +20,7 @@ const MyOrders = () => {
   const [userFavorites, setUserFavorites] = useState([]);
   const [userCart, setUserCart] = useState([]);
   const [showPopup, setShowPopup] = useState(false);
-
+  const [isLoading, setIsLoading] = useState(true);
 const invoiceIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968572/invoice_kkbd8p.svg";
 const closeIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968567/close_mcygjs.svg";
   const statuses = [
@@ -41,6 +40,7 @@ const closeIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968567/
  const SearchIcon = "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968618/search_ke1zur.svg";
 const cartIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968566/cart_jsj3mh.svg";
   const loadOrders = async () => {
+    setIsLoading(true);
     try {
       const res = await getMyOrders(user._id);
       let filtered = res.data;
@@ -61,9 +61,10 @@ const cartIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968566/c
       setOrders(filtered);
     } catch (err) {
       console.error("Error fetching orders:", err);
+    } finally {
+      setIsLoading(false);
     }
   };
-
   useEffect(() => {
     if (!user?._id) return;
     const fetchUserData = async () => {
@@ -82,7 +83,6 @@ const cartIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968566/c
     };
     fetchUserData();
   }, [user]);
-
 useEffect(() => {
   if (!user) return;
   console.log("📍 Notification.permission:", Notification.permission);
@@ -102,32 +102,38 @@ useEffect(() => {
     setTimeout(() => setShowAlert(false), 3000);
   });
 }, [user]);
-  
   useEffect(() => {
     const delayDebounce = setTimeout(() => {
       if (user?._id) loadOrders();
     }, 300);
     return () => clearTimeout(delayDebounce);
   }, [user, statusFilter, search]);
-
 const allowNotifications = async () => {
     await requestNotificationPermission(user._id);
     setShowPopup(false);
     alert("✨ تم تفعيل الإشعارات!");
   };
-
   const handleAddToCart = async (product) => {
     if (!user?._id) return;
-    const currentItem = userCart.find((i) => (i.product?._id || i.product) === product._id);
-    const currentQty = currentItem ? currentItem.quantity : 0;
-    const stock = product.stock || 0;
-    if (currentQty + 1 > stock) {
-      setAlertMessage(`لا يمكن إضافة أكثر من ${stock} من "${product.name}"`);
-      setShowAlert(true);
-      setTimeout(() => setShowAlert(false), 2500);
-      return;
-    }
     try {
+      // جلب المنتج الطازج من API للتحقق من وجوده ومخزونه
+      const productRes = await getProductById(product._id);
+      const freshProduct = productRes.data;
+      if (!freshProduct || freshProduct.stock === 0) {
+        setAlertMessage("لم يعد متوفر");
+        setShowAlert(true);
+        setTimeout(() => setShowAlert(false), 2500);
+        return;
+      }
+      const currentItem = userCart.find((i) => (i.product?._id || i.product) === product._id);
+      const currentQty = currentItem ? currentItem.quantity : 0;
+      const stock = freshProduct.stock || 0;
+      if (currentQty + 1 > stock) {
+        setAlertMessage(`لا يمكن إضافة أكثر من ${stock} من "${product.name}"`);
+        setShowAlert(true);
+        setTimeout(() => setShowAlert(false), 2500);
+        return;
+      }
       await addToCart(user._id, {
         product: product._id,
         name: product.name,
@@ -155,7 +161,7 @@ const allowNotifications = async () => {
       setUserCart(updatedCart);
     } catch (err) {
       console.error("❌ خطأ أثناء إضافة المنتج للسلة:", err);
-      setAlertMessage("حدث خطأ أثناء إضافة المنتج 😔");
+      setAlertMessage("لم يعد متوفر");
       setShowAlert(true);
       setTimeout(() => setShowAlert(false), 2500);
     }
@@ -197,11 +203,6 @@ const allowNotifications = async () => {
     const url = getImageUrl(proofUrl);
     window.open(url, "_blank");
   };
-
-
-  
-
-  
   return (
     <>
 {showPopup && (
@@ -258,32 +259,42 @@ const allowNotifications = async () => {
           </div>
         </div>
         {/* 🧾 قائمة الطلبات */}
-        <AnimatePresence>
-          {orders.length > 0 ? (
-            orders.map((order) => (
-              <motion.div
-                key={order._id}
-                className="order-card"
-                whileHover={{ scale: 1.01 }}
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 15 }}
-                transition={{ duration: 0.25 }}
-              >
-                <div className="order-number">#{order.orderNumber}</div>
-                <div
-                  className="invoice-circle"
-                  onClick={() => setSelectedOrder(order)}
-                >
-                  <img src={invoiceIcon} alt="invoice" width={22} />
-                </div>
-                <div className="status-badge">{order.status}</div>
-              </motion.div>
-            ))
+        <div className="orders-container">
+          {isLoading ? (
+            <motion.div
+              className="loading-bar"
+              animate={{ x: ["100%", "-100%"] }}
+              transition={{ repeat: Infinity, duration: 1.5, ease: "linear" }}
+            />
           ) : (
-            <p className="text-center text-gray-400">لا توجد طلبات حالياً</p>
+            <AnimatePresence>
+              {orders.length > 0 ? (
+                orders.map((order) => (
+                  <motion.div
+                    key={order._id}
+                    className="order-card"
+                    whileHover={{ scale: 1.01 }}
+                    initial={{ opacity: 0, y: 15 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 15 }}
+                    transition={{ duration: 0.25 }}
+                  >
+                    <div className="order-number">#{order.orderNumber}</div>
+                    <div
+                      className="invoice-circle"
+                      onClick={() => setSelectedOrder(order)}
+                    >
+                      <img src={invoiceIcon} alt="invoice" width={22} />
+                    </div>
+                    <div className="status-badge">{order.status}</div>
+                  </motion.div>
+                ))
+              ) : (
+                <p className="text-center text-gray-400">لا توجد طلبات حالياً</p>
+              )}
+            </AnimatePresence>
           )}
-        </AnimatePresence>
+        </div>
       </div>
       {/* 🪟 نافذة التفاصيل */}
       <AnimatePresence>

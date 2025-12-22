@@ -226,6 +226,10 @@ const Checkout = () => {
               shipping: {
                 name: `${user.firstName} ${user.lastName}`,
                 phone: user.phone,
+                city: user.city,
+                neighborhood: user.neighborhood,
+                street: user.street,
+                nearestLandmark: user.nearestLandmark,
                 address: `${user.city || ''}, ${user.neighborhood || ''}, ${user.street || ''}, ${user.nearestLandmark || ''}`.trim(), // جمع العنوان من الحقول الجديدة
                 coords: [user.longitude, user.latitude],
               },

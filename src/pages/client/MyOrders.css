@@ -103,7 +103,6 @@
   width: 95%;
   margin-bottom: 14px;
 transition: transform 0.3s ease, box-shadow 0.3s ease;
-
 }
 .order-card:active {
   transform: scale(0.98);
@@ -188,7 +187,6 @@ transition: transform 0.3s ease, box-shadow 0.3s ease;
   opacity: 0.8;
   transition: 0.2s ease;
 }
-
 .close-btn {
   background: transparent;
   border: none;
@@ -200,8 +198,6 @@ transition: transform 0.3s ease, box-shadow 0.3s ease;
   align-items: center;
   justify-content: center;
 }
-
-
 .close-icon-btn:hover {
   opacity: 1;
   transform: scale(1.1);
@@ -273,7 +269,6 @@ transition: transform 0.3s ease, box-shadow 0.3s ease;
   font-size: 14px;
   transition: 0.3s ease;
 }
-
 .share-btn:hover {
   background: #6b7f4f;
   color: #f1ebcc;
@@ -334,7 +329,6 @@ transition: transform 0.3s ease, box-shadow 0.3s ease;
   pointer-events: none;
   animation: slideDownFade 2.5s ease forwards;
 }
-
 /* ✨ حركة الانزلاق من الأعلى */
 @keyframes slideDownFade {
   0% {
@@ -354,7 +348,6 @@ transition: transform 0.3s ease, box-shadow 0.3s ease;
     transform: translate(-50%, -40px);
   }
 }
-
 .heart-symbol {
   font-size: 18px;
   line-height: 1;
@@ -411,14 +404,12 @@ transition: transform 0.3s ease, box-shadow 0.3s ease;
     opacity: 1;
   }
 }
-
 @keyframes fadeOut {
   to {
     opacity: 0;
     transform: translate(-50%, -20px);
   }
 }
-
 /* 📱 ضبط الأحجام لشاشة الجوال */
 @media (max-width: 480px) {
  .alert-toast {
@@ -441,7 +432,6 @@ transition: transform 0.3s ease, box-shadow 0.3s ease;
     animation: slideDown 0.4s ease, fadeOut 0.4s ease 1.8s forwards;
     opacity: 1;
   }
-
   .search-wrapper {
     flex-direction: column;
   }
@@ -456,4 +446,21 @@ transition: transform 0.3s ease, box-shadow 0.3s ease;
     width: 60px;
     height: 60px;
   }
+}
+/* 🔄 حاوية قائمة الطلبات */
+.orders-container {
+  width: 95%;
+  max-width: 700px;
+  margin: 0 auto;
+  position: relative;
+  overflow: hidden;
+}
+/* 🔄 شريط التحميل المتحرك */
+.loading-bar {
+  height: 4px;
+  background: linear-gradient(to right, #f2a72d, #d15c1d);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
 }
