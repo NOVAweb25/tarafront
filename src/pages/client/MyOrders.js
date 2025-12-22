@@ -4,10 +4,10 @@ import { getMyOrders, addToCart, addFavorite } from "../../api/api";
 import { Share2 } from "lucide-react";
 import BottomNav from "../../components/BottomNav";
 import { getUserById, getProductById } from "../../api/api";
-import NotificationPopup from "../../components/NotificationPopup";
-import { requestNotificationPermission, listenToMessages } from "../../firebase";
 import "./MyOrders.css";
+
 const API_BASE = process.env.REACT_APP_API_BASE; // ✅ من env
+
 const MyOrders = () => {
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
   const [orders, setOrders] = useState([]);
@@ -19,10 +19,11 @@ const MyOrders = () => {
   const [alertMessage, setAlertMessage] = useState("");
   const [userFavorites, setUserFavorites] = useState([]);
   const [userCart, setUserCart] = useState([]);
-  const [showPopup, setShowPopup] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-const invoiceIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968572/invoice_kkbd8p.svg";
-const closeIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968567/close_mcygjs.svg";
+
+  const invoiceIcon = "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968572/invoice_kkbd8p.svg";
+  const closeIcon = "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968567/close_mcygjs.svg";
+
   const statuses = [
     "بانتظار تأكيد الطلب",
     "تم تأكيد الطلب",
@@ -31,14 +32,17 @@ const closeIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968567/
     "جاهز للاستلام",
     "تم رفض الطلب",
   ];
+
   // ✅ دالة تساعدنا في تحديد الرابط الصحيح (Cloudinary أو السيرفر)
   const getImageUrl = (path) => {
     if (!path) return "";
     if (path.startsWith("http")) return path; // Cloudinary
     return `${API_BASE}${path}`; // سيرفر
   };
- const SearchIcon = "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968618/search_ke1zur.svg";
-const cartIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968566/cart_jsj3mh.svg";
+
+  const SearchIcon = "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968618/search_ke1zur.svg";
+  const cartIcon = "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968566/cart_jsj3mh.svg";
+
   const loadOrders = async () => {
     setIsLoading(true);
     try {
@@ -65,6 +69,7 @@ const cartIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968566/c
       setIsLoading(false);
     }
   };
+
   useEffect(() => {
     if (!user?._id) return;
     const fetchUserData = async () => {
@@ -83,36 +88,14 @@ const cartIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968566/c
     };
     fetchUserData();
   }, [user]);
-useEffect(() => {
-  if (!user) return;
-  console.log("📍 Notification.permission:", Notification.permission);
-  if ("Notification" in window) {
-    if (Notification.permission === "default") {
-      setShowPopup(true);
-    } else if (Notification.permission === "granted") {
-      requestNotificationPermission(user._id); // أعد الحصول على token
-    } else {
-      console.warn("⚠️ Notifications denied by user");
-    }
-  }
-  // 🟢 استمع للإشعارات في الواجهة (foreground)
-  listenToMessages((notification) => {
-    setAlertMessage(`${notification.title}: ${notification.body}`); // أو toast
-    setShowAlert(true);
-    setTimeout(() => setShowAlert(false), 3000);
-  });
-}, [user]);
+
   useEffect(() => {
     const delayDebounce = setTimeout(() => {
       if (user?._id) loadOrders();
     }, 300);
     return () => clearTimeout(delayDebounce);
   }, [user, statusFilter, search]);
-const allowNotifications = async () => {
-    await requestNotificationPermission(user._id);
-    setShowPopup(false);
-    alert("✨ تم تفعيل الإشعارات!");
-  };
+
   const handleAddToCart = async (product) => {
     if (!user?._id) return;
     try {
@@ -166,6 +149,7 @@ const allowNotifications = async () => {
       setTimeout(() => setShowAlert(false), 2500);
     }
   };
+
   const handleFavorite = async (product) => {
     if (!user?._id) return;
     try {
@@ -183,6 +167,7 @@ const allowNotifications = async () => {
       console.error("❌ خطأ أثناء تحديث المفضلة:", err);
     }
   };
+
   const handleShareLocation = (coords) => {
     if (!coords || coords.length !== 2) return;
     const lat = coords[1];
@@ -198,25 +183,20 @@ const allowNotifications = async () => {
       window.open(url, "_blank");
     }
   };
+
   const openReceipt = (proofUrl) => {
     if (!proofUrl) return;
     const url = getImageUrl(proofUrl);
     window.open(url, "_blank");
   };
+
   return (
     <>
-{showPopup && (
-        <NotificationPopup
-          message="هل تريد تفعيل الإشعارات لتتبع حالة طلباتك؟"
-          onAllow={allowNotifications}
-          onClose={() => setShowPopup(false)}
-        />
-      )}
       <div className="myorders-page">
         {/* 🔍 شريط البحث والفلاتر */}
         <div className="search-wrapper">
           <div className="search-box">
-           <img src={SearchIcon} alt="بحث" className="search-icon" />
+            <img src={SearchIcon} alt="بحث" className="search-icon" />
             <input
               type="text"
               placeholder="بحث برقم الطلب"
@@ -321,11 +301,11 @@ const allowNotifications = async () => {
               <div className="invoice-header">
                 <h3>فاتورة الطلب #{selectedOrder.orderNumber}</h3>
                 <button
-  className="close-btn"
-  onClick={() => setSelectedOrder(null)}
->
-  <img src={closeIcon} alt="close" className="close-icon-btn" />
-</button>
+                  className="close-btn"
+                  onClick={() => setSelectedOrder(null)}
+                >
+                  <img src={closeIcon} alt="close" className="close-icon-btn" />
+                </button>
               </div>
               <div className="invoice-body">
                 {selectedOrder.shipping && (
@@ -454,4 +434,5 @@ const allowNotifications = async () => {
     </>
   );
 };
+
 export default MyOrders;
