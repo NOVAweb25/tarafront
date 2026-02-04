@@ -1,0 +1,232 @@
+.checkout-page {
+  min-height: 100vh;
+  background: #02251A; /* أخضر غامق */
+  padding: 20px;
+  font-family: "Tajawal", sans-serif;
+}
+.checkout-card {
+  max-width: 500px;
+  margin: 0 auto;
+}
+.checkout-header {
+  margin: 15px 0 10px;
+  color: #FF7518; /* برتقالي */
+}
+.checkout-box {
+  background: #145032; /* أخضر متوسط */
+  border-radius: 30px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  padding: 15px;
+  margin-bottom: 15px;
+  position: relative;
+  color: #E1B866; /* أصفر */
+}
+.edit-circle {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  background: #02251A;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.product-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 1px solid #E1B866;
+  padding: 8px 0;
+}
+.product-img {
+  width: 60px;
+  height: 60px;
+  border-radius: 30px;
+}
+.product-info {
+  flex: 1;
+}
+.product-info h4 {
+  color: #E1B866;
+}
+.product-info p {
+  color: #FF7518;
+}
+.delete-icon {
+  width: 20px;
+  cursor: pointer;
+}
+.edit-area {
+  margin-top: 10px;
+}
+.edit-input {
+  width: 100%;
+  padding: 8px;
+  border-radius: 10px;
+  border: 1px solid #E1B866;
+  margin-bottom: 8px;
+  background: #02251A;
+  color: #E1B866;
+}
+.small-btn {
+  background: #A52A2A; /* أحمر */
+  border: none;
+  border-radius: 30px;
+  color: #E1B866;
+  padding: 8px 12px;
+  cursor: pointer;
+  margin-bottom: 8px;
+}
+.upload-label {
+  display: block;
+  background: #A52A2A;
+  color: #E1B866;
+  padding: 10px;
+  border-radius: 30px;
+  cursor: pointer;
+  text-align: center;
+  margin-top: 10px;
+}
+.file-name {
+  margin-top: 5px;
+  font-size: 14px;
+  color: #4B0082; /* بنفسجي */
+  text-align: center;
+}
+.confirm-btn {
+  width: 100%;
+  padding: 10px;
+  border: none;
+  border-radius: 30px;
+  background: linear-gradient(90deg, #FF7518, #E1B866);
+  font-weight: 600;
+  color: #02251A;
+  margin-top: 10px;
+  cursor: pointer;
+}
+.map-iframe {
+  margin-top: 10px;
+  border-radius: 10px;
+}
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+}
+.qty-btn {
+  background-color: #02251A;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  border: none;
+  padding: 5px;
+  cursor: pointer;
+}
+.small-icon {
+  width: 22px;
+  height: 22px;
+  cursor: pointer;
+}
+.copy-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.copy-icon {
+  cursor: pointer;
+  font-size: 18px;
+  color: #E1B866;
+  transition: 0.2s;
+}
+.copy-icon:hover {
+  color: #FF7518;
+}
+.copied-text {
+  color: #A52A2A;
+  font-size: 14px;
+}
+.toast {
+  position: fixed;
+  bottom: 90px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #A52A2A;
+  color: #E1B866;
+  padding: 10px 20px;
+  border-radius: 30px;
+  font-size: 14px;
+  font-weight: 600;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  z-index: 2000;
+}
+/* Media Queries للتناسب مع الشاشات المختلفة */
+@media (max-width: 599px) {
+  .checkout-page {
+    padding: 15px;
+  }
+  .checkout-box {
+    padding: 12px;
+  }
+  .product-img {
+    width: 50px;
+    height: 50px;
+  }
+  .small-btn {
+    padding: 6px 10px;
+    font-size: 14px;
+  }
+  .confirm-btn {
+    padding: 8px;
+    font-size: 15px;
+  }
+  .edit-input {
+    font-size: 14px;
+  }
+  .checkout-header {
+    font-size: 18px;
+  }
+}
+@media (min-width: 600px) {
+  .checkout-card {
+    max-width: 600px;
+  }
+  .checkout-box {
+    padding: 20px;
+  }
+  .product-card {
+    gap: 15px;
+  }
+  .product-img {
+    width: 70px;
+    height: 70px;
+  }
+}
+@media (min-width: 768px) {
+  .checkout-page {
+    padding: 30px;
+  }
+  .checkout-card {
+    max-width: 700px;
+  }
+  .checkout-header {
+    font-size: 22px;
+  }
+  .edit-input {
+    padding: 10px;
+  }
+  .small-btn {
+    padding: 10px 15px;
+  }
+  .confirm-btn {
+    padding: 12px;
+  }
+}
+@media (min-width: 1024px) {
+  .checkout-card {
+    max-width: 800px;
+  }
+}
