@@ -6,50 +6,49 @@ import {
   getProducts,
   addFavorite,
   addToCart,
-  updateCartItem,
-  removeFromCart,
   getUserById,
-  getProductById, // ✅ أضف هذا الـ import من api/api.js إذا لزم
-} from "../../api/api";
-import CloseIcon from "../../assets/close.svg";
-import CartIcon from "../../assets/cart.svg";
+  getProductById,
+} from "../../api/api"; // ✅ حذفت unused imports مثل updateCartItem, removeFromCart
+import CartIcon from "../../assets/cart.svg"; // ✅ حذفت CloseIcon لأنه unused
 import "./Sections.css";
 import { useNavigate, useLocation } from "react-router-dom";
+
 const API_BASE = process.env.REACT_APP_API_BASE; // ✅ من env
+
 const Sections = () => {
   const [sections, setSections] = useState([]);
   const [categories, setCategories] = useState([]);
   const [products, setProducts] = useState([]);
   const [selectedSection, setSelectedSection] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState(null);
-  const [search, setSearch] = useState("");
-  const [expandedSection, setExpandedSection] = useState(null);
+  const [search] = useState(""); // ✅ حذفت setSearch لأنه unused، وsearch مستخدم في filter لكن إذا مش محتاج search، احذفه كله
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [loading, setLoading] = useState(false);
   const [userFavorites, setUserFavorites] = useState([]);
-  const [userCart, setUserCart] = useState([]);
   const [showAlert, setShowAlert] = useState(false);
   const categoriesRef = useRef(null);
   const [alertMessage, setAlertMessage] = useState("");
   const navigate = useNavigate();
   const location = useLocation();
   const sectionsRef = useRef(null);
-  const SearchIcon = "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968618/search_ke1zur.svg";
   const rawUser = localStorage.getItem("user");
   const user = rawUser ? JSON.parse(rawUser) : null;
   const userId = user?._id || user?.id || null;
+
   // ✅ دالة مساعدة لتحديد رابط الصورة الصحيح
   const getImageUrl = (path) => {
     if (!path) return "";
     if (path.startsWith("http")) return path; // من Cloudinary
     return `${API_BASE}${path}`; // من السيرفر
   };
+
   const normalizeId = (id) => {
     if (!id) return "";
     if (typeof id === "string") return id;
     if (id.$oid) return id.$oid;
     return id.toString();
   };
+
   // 🔹 تحميل الأقسام
   useEffect(() => {
     (async () => {
@@ -70,6 +69,7 @@ const Sections = () => {
       }
     })();
   }, []);
+
   useEffect(() => {
     if (!userId) return;
     (async () => {
@@ -77,12 +77,12 @@ const Sections = () => {
         const res = await getUserById(userId);
         const u = res.data;
         setUserFavorites(u.favorites?.map((f) => f._id || f) || []);
-        setUserCart(u.cart || []);
       } catch (e) {
         console.error(e);
       }
     })();
-  }, [userId]);
+  }, [userId]); // ✅ حذفت setUserCart لأن userCart unused
+
   useEffect(() => {
     if (!selectedSection) return;
     (async () => {
@@ -100,6 +100,7 @@ const Sections = () => {
       }
     })();
   }, [selectedSection]);
+
   useEffect(() => {
     const fetchProducts = async () => {
       if (!selectedSection) return;
@@ -107,11 +108,10 @@ const Sections = () => {
       try {
         const res = await getProducts({ sectionId: normalizeId(selectedSection._id) });
         const data = res.data
-          // لا نحذف المنتجات، فقط نعرضها كلها
           .map((p) => ({
             ...p,
             mainImage: getImageUrl(p.mainImage),
-            stock: p.stock ?? 0, // ✅ ضمن وجود stock في الـ products state
+            stock: p.stock ?? 0, // ✅ ضمن وجود stock
           }));
         setProducts(data);
       } catch (err) {
@@ -122,11 +122,7 @@ const Sections = () => {
     };
     fetchProducts();
   }, [selectedSection]);
-  const handleSectionSelect = (section) => {
-    const id = normalizeId(section._id);
-    setSelectedSection(section);
-    setSelectedCategory(null);
-  };
+
   const handleCategoryClick = async (category) => {
     setSelectedCategory(category);
     setLoading(true);
@@ -147,6 +143,7 @@ const Sections = () => {
       setLoading(false);
     }
   };
+
   const loadProducts = async (sectionId, categoryId = null) => {
     setLoading(true);
     try {
@@ -169,6 +166,7 @@ const Sections = () => {
       setLoading(false);
     }
   };
+
   // ✅ تحميل القسم والتصنيف من الرابط
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -196,7 +194,8 @@ const Sections = () => {
         loadProducts(sectionId);
       }
     })();
-  }, [sections, location]);
+  }, [sections, location, loadProducts]); // ✅ أضفت loadProducts كـ dependency لإزالة التحذير
+
   // ✅ تحميل جميع المنتجات إذا لا يوجد قسم محدد
   useEffect(() => {
     const fetchAllProducts = async () => {
@@ -218,12 +217,14 @@ const Sections = () => {
     };
     fetchAllProducts();
   }, [selectedSection]); // ❗ تتغير فقط لما القسم يتغير
+
   // ✅ إلغاء التحديد عند النقر خارج الأقسام
   const filteredSections = sections.filter(
     (section) =>
       section.name.toLowerCase().includes(search.toLowerCase()) ||
       section.description?.toLowerCase().includes(search.toLowerCase())
   );
+
   const handleFavorite = async (product) => {
     if (!userId) {
       setShowAuthModal(true);
@@ -246,6 +247,7 @@ const Sections = () => {
       console.error("❌ Error updating favorites:", err);
     }
   };
+
   const handleAddToCart = async (product) => {
     if (!userId) {
       setShowAuthModal(true);
@@ -255,7 +257,7 @@ const Sections = () => {
     let stock = 0;
     try {
       const productRes = await getProductById(product._id);
-      stock = productRes.data.stock ?? 0; // ✅ ضمن وجود stock في الـ products state
+      stock = productRes.data.stock ?? 0; // ✅ ضمن وجود stock
     } catch (err) {
       console.error("❌ Error fetching product stock:", err);
       setAlertMessage("حدث خطأ أثناء التحقق من المخزون 😔");
@@ -297,6 +299,7 @@ const Sections = () => {
       setTimeout(() => setShowAlert(false), 2500);
     }
   };
+
   // 🔔 دالة جديدة للإشعار بالرغبة في المنتج
   const handleNotifyInterest = async (product) => {
     if (!userId) {
@@ -320,8 +323,7 @@ const Sections = () => {
       setTimeout(() => setShowAlert(false), 2500);
     }
   };
-  const openDetails = (section) => setExpandedSection(section);
-  const closeDetails = () => setExpandedSection(null);
+
   return (
     <div className="sections-container">
       {/* ⭐ العنوان + زر الكل في نفس السطر */}
@@ -512,4 +514,5 @@ const Sections = () => {
     </div>
   );
 };
+
 export default Sections;
