@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { fonts, iconSizes } from "../utils/theme";
 import axios from "axios";
-
 const AdminSidebar = () => {
   const [isOpen, setIsOpen] = useState(true);
   const [openAdminMenu, setOpenAdminMenu] = useState(false);
@@ -23,15 +22,12 @@ const AdminSidebar = () => {
     "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968581/logo_revtav.svg";
   const toggleIcon =
     "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968565/back_xur01t.svg";
-  const navigate = useNavigate();
-
   const handleLogout = () => {
     // 🔥 بث حدث تسجيل الخروج
     window.dispatchEvent(new Event("logout"));
     // 🔥 إغلاق نافذة التأكيد
     setShowLogoutModal(false);
   };
-
   const loadNotifications = async () => {
     try {
       const res = await axios.get(
@@ -42,13 +38,12 @@ const AdminSidebar = () => {
       console.error("خطأ أثناء جلب الطلبات:", err);
     }
   };
-
   useEffect(() => {
     loadNotifications();
     const interval = setInterval(loadNotifications, 15000);
     return () => clearInterval(interval);
-  }, []);
-
+  }, [loadNotifications]);
+ 
   return (
     <>
       <motion.div
@@ -218,13 +213,7 @@ const AdminSidebar = () => {
     </>
   );
 };
-
 export default AdminSidebar;
-
-
-
-
- 
 /* 🎨 الأنماط */
 const styles = {
 sidebar: {
@@ -243,8 +232,6 @@ sidebar: {
   zIndex: 2000,
   fontFamily: fonts.primary,
 },
-
-
   toast: {
     position: "fixed",
     top: "20px",
@@ -314,7 +301,6 @@ sidebar: {
   borderRadius: "30px",
   transition: "all 0.2s",
 },
-
   toggleButton: {
     cursor: "pointer",
     alignSelf: "center",

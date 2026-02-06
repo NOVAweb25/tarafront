@@ -10,7 +10,6 @@ import {
 } from "../../api/api";
 import "./AdminCategories.css";
 import PlusIcon from "../../assets/plus.svg";
-
 const AdminCategories = () => {
   const [categories, setCategories] = useState([]);
   const [sections, setSections] = useState([]);
@@ -27,17 +26,14 @@ const AdminCategories = () => {
   const modalRef = useRef(null);
 const DeleteIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968568/delete_kf2kz4.svg";
 const CloseIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968567/close_mcygjs.svg";
-
 const SearchIcon = "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968618/search_ke1zur.svg";
 const EditIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968570/edit_xmyhv0.svg";
   useEffect(() => {
     fetchSections();
   }, []);
-
   useEffect(() => {
     if (sections.length > 0) fetchCategories();
-  }, [sections]);
-
+  }, [sections, fetchCategories]);
   const fetchCategories = async () => {
     try {
       const res = await getCategories();
@@ -55,7 +51,6 @@ const EditIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968570/e
       console.error("Error fetching categories:", err);
     }
   };
-
   const fetchSections = async () => {
     try {
       const res = await getSections();
@@ -64,7 +59,6 @@ const EditIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968570/e
       console.error("Error fetching sections:", err);
     }
   };
-
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (modalRef.current && !modalRef.current.contains(e.target)) {
@@ -73,19 +67,16 @@ const EditIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968570/e
     };
     if (showModal) document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [showModal]);
-
+  }, [showModal, closeModal]);
   const closeModal = () => {
     setShowModal(false);
     setSelectedCategory(null);
     resetForm();
   };
-
   const resetForm = () => {
     setFormData({ name: "", section: "", description: "", slug: "" });
     setIsUploading(false);
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.name.trim() || !formData.section.trim()) {
@@ -126,7 +117,6 @@ const EditIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968570/e
       setIsUploading(false);
     }
   };
-
   const handleDelete = async (id) => {
     if (window.confirm("هل أنت متأكد من الحذف؟")) {
       try {
@@ -138,7 +128,6 @@ const EditIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968570/e
       }
     }
   };
-
   const handleEdit = (category) => {
     setSelectedCategory(category);
     const sectionId = typeof category.section === 'string' ? category.section : category.section?._id || "";
@@ -150,11 +139,9 @@ const EditIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968570/e
     });
     setShowModal(true);
   };
-
   const filteredCategories = categories.filter(cat =>
     cat.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
-
   return (
     <div className="admin-layout">
       <AdminSidebar />
@@ -170,7 +157,6 @@ const EditIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968570/e
           />
           <img src={SearchIcon} alt="بحث" className="search-icon" />
         </div>
-
         {/* Floating Add Button */}
         <motion.button
           className="add-btn"
@@ -183,7 +169,6 @@ const EditIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968570/e
         >
           <img src={PlusIcon} alt="إضافة" />
         </motion.button>
-
         {/* Categories List */}
         {filteredCategories.length > 0 ? (
           filteredCategories.map((category) => (
@@ -213,7 +198,6 @@ const EditIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968570/e
                   )}
                 </div>
               </div>
-
               <div className="category-actions">
                 <motion.button
                   className="edit-btn"
@@ -235,7 +219,6 @@ const EditIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968570/e
         ) : (
           <p className="no-categories">لا توجد تصنيفات</p>
         )}
-
         {/* Modal */}
         <AnimatePresence>
           {showModal && (
@@ -306,5 +289,4 @@ const EditIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968570/e
     </div>
   );
 };
-
 export default AdminCategories;
