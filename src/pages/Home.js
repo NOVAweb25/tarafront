@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { colors, fonts, fontSizes, buttonSizes } from "../utils/theme";
-
+import { fonts, fontSizes, buttonSizes } from "../utils/theme";
 
 const Home = () => {
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));

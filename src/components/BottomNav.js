@@ -29,7 +29,7 @@ const homeIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1770209677/h
 const favIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1770209685/like_ubf5ei.svg";
 const cartIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968566/cart_jsj3mh.svg";
 const API_BASE = process.env.REACT_APP_API_BASE;
-const CLOUDINARY_BASE = process.env.REACT_APP_CLOUDINARY_BASE;
+
 const getImageUrl = (url) => {
   if (!url) return "";
   if (url.startsWith("http")) return url; // رابط Cloudinary

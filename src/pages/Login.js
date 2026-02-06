@@ -2,8 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { loginUser } from "../api/api";
-import { colors, fonts, fontSizes, buttonSizes } from "../utils/theme";
-
+import { fonts, fontSizes, buttonSizes } from "../utils/theme";
 
 const Login = () => {
   const [form, setForm] = useState({ username: "", password: "" });

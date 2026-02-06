@@ -1,7 +1,6 @@
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState } from "react";          // ← useEffect تم إزالته
 import { Music, Music2 } from "lucide-react";
 import { useLocation } from "react-router-dom";
-
 
 const BackgroundMusic = () => {
   const audioRef = useRef(null);
@@ -13,22 +12,22 @@ const BackgroundMusic = () => {
     if (isPlaying) {
       audioRef.current.pause();
     } else {
-      audioRef.current.volume = 0.3; // صوت هادئ
+      audioRef.current.volume = 0.3;
       audioRef.current.play();
     }
     setIsPlaying(!isPlaying);
   };
-const location = useLocation();
 
-const blockedRoutes = [
-  "/checkout",
-  "/payment-success",
-  "/payment-failed"
-];
+  const location = useLocation();
+  const blockedRoutes = [
+    "/checkout",
+    "/payment-success",
+    "/payment-failed"
+  ];
 
-if (blockedRoutes.includes(location.pathname)) {
-  return null;
-}
+  if (blockedRoutes.includes(location.pathname)) {
+    return null;
+  }
 
   return (
     <>

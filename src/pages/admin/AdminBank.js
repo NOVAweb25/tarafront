@@ -7,7 +7,6 @@ import {
   updateBankDetail,
 } from "../../api/api";
 import "./AdminBank.css";
-const API_BASE = process.env.REACT_APP_API_BASE;
 
 const bankOptions = [
   "الأهلي",
