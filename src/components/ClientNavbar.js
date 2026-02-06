@@ -1,8 +1,7 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { logoutUser } from "../api/api";
-
 const ClientNavbar = () => {
   const [user, setUser] = useState(null);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
@@ -10,9 +9,8 @@ const ClientNavbar = () => {
   const [showMenu, setShowMenu] = useState(false);
   const menuRef = useRef(null);
   const navigate = useNavigate();
-  const accountIcon= "https://res.cloudinary.com/dp1bxbice/image/upload/v1764962209/person_iwqjor.svg";
-  const logo= "https://res.cloudinary.com/dp1bxbice/image/upload/v1763968581/logo_revtav.svg";
-
+  const accountIcon = "https://res.cloudinary.com/dp1bxbice/image/upload/v1764962209/person_iwqjor.svg";
+  const logo = "https://res.cloudinary.com/dp1bxbice/image/upload/v1770413838/logo_agmded.png";
   useEffect(() => {
     const savedUser = JSON.parse(localStorage.getItem("user"));
     if (savedUser) setUser(savedUser);
@@ -26,7 +24,6 @@ const ClientNavbar = () => {
     window.addEventListener("authChange", handleAuthChange);
     return () => window.removeEventListener("authChange", handleAuthChange);
   }, []);
-
   // ✅ إغلاق القائمة عند النقر خارجها
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -35,7 +32,6 @@ const ClientNavbar = () => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
-
   // ✅ تسجيل الخروج (مُحدّثة)
   const handleLogout = async () => {
     try {
@@ -59,52 +55,48 @@ const ClientNavbar = () => {
     // ✅ توجيه المستخدم للصفحة الرئيسية (اختياري)
     navigate("/");
   };
-
   // ✅ التعامل مع الزائر
   const handleGuestClick = () => {
     setShowAuthModal(true);
     setShowMenu(false);
   };
-
   // ✅ الانتقال وإغلاق النافذة فور الضغط
   const handleAuthNavigation = (path) => {
     setShowAuthModal(false);
     navigate(path);
   };
-
   return (
     <>
       {/* ✅ شريط التنقل */}
       <nav style={styles.navbar}>
-        {/* 🟣 الشعار في المنتصف */}
-        <div style={styles.logoContainer}>
-          <div style={styles.logoCircle}>
-            <img src={logo} alt="Logo" style={styles.logo} />
-          </div>
-        </div>
-        {/* 👤 أيقونة المستخدم في اليمين */}
+        {/* 👤 أيقونة المستخدم في اليسار */}
         <div style={styles.userContainer} ref={menuRef}>
           <div
             style={styles.userButton}
             onClick={() => setShowMenu((prev) => !prev)}
           >
+            {user && (
+              <motion.span
+                style={styles.userName}
+                initial={{ x: 0, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ duration: 0.3 }}
+              >
+                {user.firstName} {user.lastName}
+              </motion.span>
+            )}
             <div style={styles.iconCircle}>
               <img src={accountIcon} alt="Account" style={styles.icon} />
             </div>
-            {user && (
-              <span style={styles.userName}>
-                {user.firstName} {user.lastName}
-              </span>
-            )}
           </div>
           {/* 🔽 القائمة المنسدلة */}
           <AnimatePresence>
             {showMenu && (
               <motion.div
                 style={styles.dropdown}
-                initial={{ x: 150, opacity: 0 }}
+                initial={{ x: -150, opacity: 0 }}
                 animate={{ x: 0, opacity: 1 }}
-                exit={{ x: 150, opacity: 0 }}
+                exit={{ x: -150, opacity: 0 }}
                 transition={{ duration: 0.25 }}
               >
                 <button
@@ -138,6 +130,12 @@ const ClientNavbar = () => {
             )}
           </AnimatePresence>
         </div>
+        {/* 🟣 الشعار في اليمين */}
+        <div style={styles.logoContainer}>
+          <div style={styles.logoCircle}>
+            <img src={logo} alt="Logo" style={styles.logo} />
+          </div>
+        </div>
       </nav>
       {/* ✅ نافذة تأكيد تسجيل الخروج */}
       <AnimatePresence>
@@ -155,7 +153,7 @@ const ClientNavbar = () => {
               exit={{ scale: 0.8 }}
               transition={{ duration: 0.3 }}
             >
-              <h3 style={{ color: "#121921", marginBottom: "15px" }}>
+              <h3 style={{ color: "#E1B866", marginBottom: "15px" }}>
                 هل أنت متأكد من تسجيل الخروج؟
               </h3>
               <div style={styles.modalActions}>
@@ -192,7 +190,8 @@ const ClientNavbar = () => {
               transition={{ duration: 0.35 }}
             >
               <p style={styles.authMessage}>
-انضم الينا لتجربة شراء كاملة </p>
+                انضم الينا لتجربة شراء كاملة
+              </p>
               <div style={styles.authActions}>
                 <button
                   style={styles.joinButton}
@@ -220,7 +219,6 @@ const ClientNavbar = () => {
     </>
   );
 };
-
 export default ClientNavbar;
 const styles = {
   navbar: {
